@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "644385410577",
+    "project_id": "storefashion-at170557",
+    "storage_bucket": "storefashion-at170557.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:644385410577:android:85a0c563a5ed0d86bcebb0",
+        "android_client_info": {
+          "package_name": "com.actvn.at170557.storefashion"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLckmBfGheVHbzRjB-7bIhrZfhan_xLws"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
