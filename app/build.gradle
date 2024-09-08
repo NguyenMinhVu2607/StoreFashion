@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace 'com.actvn.at170557.storefashion'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.actvn.at170557.storefashion"
         minSdk 29
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -43,4 +43,9 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+
+
+//    Libs
+    implementation 'de.hdodenhof:circleimageview:2.1.0'
+    implementation 'me.relex:circleindicator:2.1.6'
 }
