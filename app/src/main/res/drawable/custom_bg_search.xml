@@ -1,0 +1,18 @@
+<!-- res/drawable/tab_background.xml -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Selected state -->
+    <item android:state_selected="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/colorPrimary"/> <!-- Transparent background when not selected -->
+            <corners android:radius="8dp"/> <!-- Corner radius -->
+        </shape>
+    </item>
+    <!-- Default state -->
+    <item>
+        <shape android:shape="rectangle">
+<!--            <solid android:color="#33CACACA"/> &lt;!&ndash; Transparent background when not selected &ndash;&gt;-->
+            <solid android:color="@color/colorPrimary"/> <!-- Transparent background when not selected -->
+            <corners android:radius="8dp"/> <!-- Corner radius -->
+        </shape>
+    </item>
+</selector>
