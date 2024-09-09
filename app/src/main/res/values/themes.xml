@@ -6,4 +6,11 @@
     </style>
 
     <style name="Theme.StoreFashion" parent="Base.Theme.StoreFashion" />
+        <style name="BottomNavigationViewStyle" parent="Widget.MaterialComponents.BottomNavigationView">
+            <!-- Removes label visibility -->
+            <item name="labelVisibilityMode">labeled</item>
+            <!-- Set the icon and text color to the same, so the color change is not visible -->
+            <item name="itemIconTint">@color/colorPrimary</item>
+            <item name="itemTextColor">@color/colorPrimary</item>
+        </style>
 </resources>
