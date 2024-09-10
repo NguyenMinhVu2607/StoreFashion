@@ -8,7 +8,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import com.actvn.at170557.storefashion.ui.main.favourite.FavouriteFragment;
 import com.actvn.at170557.storefashion.ui.main.home.HomeFragment;
 import com.actvn.at170557.storefashion.ui.main.mycart.MyCartFragment;
-import com.actvn.at170557.storefashion.ui.main.notification.NotificationFragment;
+import com.actvn.at170557.storefashion.ui.main.setting.SettingFragment;
 
 public class ViewPagerAdapter extends FragmentStateAdapter {
 
@@ -27,7 +27,7 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
             case 2:
                 return new MyCartFragment();
             case 3:
-                return new NotificationFragment();
+                return new SettingFragment();
             default:
                 return new HomeFragment();
         }

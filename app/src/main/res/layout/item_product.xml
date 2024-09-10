@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="6dp"
+    android:background="@drawable/edittext_bg"
+    android:backgroundTint="@color/white"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <!-- ImageView for displaying an image -->
+
+    <!-- First TextView -->
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/sampleimag" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="4dp"
+        android:text="TitleTitleTitle"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <!-- Second TextView -->
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:paddingTop="2dp"
+        android:text="Subtitle"
+
+        android:textColor="@color/color_neutral03"
+        android:textSize="15sp" />
+
+    <!-- Third TextView -->
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:paddingTop="2dp"
+        android:text="Description"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+
+        android:textStyle="bold" />
+
+</LinearLayout>

@@ -8,13 +8,18 @@
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottomNavigationView"
+      />
 
     <!-- BottomNavigationView -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
+        android:paddingVertical="5dp"
+        android:background="@color/white"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        style="@style/BottomNavigationViewStyle"
         app:menu="@menu/bottom_nav_menu" />
 </RelativeLayout>
