@@ -18,9 +18,7 @@
         <activity
             android:name=".ui.pay.CheckoutActivity"
             android:exported="false" />
-        <activity
-            android:name=".ui.cart.MyCartsActivity"
-            android:exported="false" />
+
         <activity
             android:name=".ui.detailproduct.DetailProductActivity"
             android:exported="true" />
