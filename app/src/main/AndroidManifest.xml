@@ -13,8 +13,17 @@
         android:theme="@style/Theme.StoreFashion"
         tools:targetApi="31">
         <activity
+            android:name=".ui.address.ListAddressActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.pay.CheckoutActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.cart.MyCartsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.detailproduct.DetailProductActivity"
-            android:exported="true" ></activity>
+            android:exported="true" />
         <activity
             android:name=".ui.main.listproducts.ListProductsActivity"
             android:exported="false" />

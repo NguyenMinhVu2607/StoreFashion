@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         hideNavigationBar();
         viewPager = findViewById(R.id.viewPager);
+        viewPager.setUserInputEnabled(false);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
         setupViewPager(viewPager);

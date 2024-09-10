@@ -48,4 +48,5 @@ dependencies {
 //    Libs
     implementation 'de.hdodenhof:circleimageview:2.1.0'
     implementation 'me.relex:circleindicator:2.1.6'
+//    implementation 'com.github.Jay-Goo:RangeSeekBar:v3.0.0'
 }

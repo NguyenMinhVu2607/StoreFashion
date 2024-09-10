@@ -79,5 +79,11 @@ public class HomeFragment extends BaseFragment {
             Intent intent = new Intent(context, ListProductsActivity.class);
             startActivity(intent);
         });
+        binding.imgFilter.setOnClickListener(v -> {
+            BottomFilter bottomFilter = new BottomFilter(context);
+
+            // Show the BottomFilter
+            bottomFilter.show();
+        });
     }
 }
