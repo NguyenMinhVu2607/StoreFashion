@@ -11,8 +11,10 @@ import android.view.Window;
 import android.view.WindowManager;
 
 
+import com.actvn.at170557.storefashion.ui.login_signup.LoginActivity;
 import com.actvn.at170557.storefashion.ui.main.MainActivity;
 import com.actvn.at170557.storefashion.R;
+import com.actvn.at170557.storefashion.utils.SharedManage;
 
 public class OnboardingActivity extends AppCompatActivity {
 
@@ -25,6 +27,7 @@ public class OnboardingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_on_boarding);
         hideNavigationBar();
         viewPager = findViewById(R.id.viewPager);
+        SharedManage.getInstance(getApplicationContext()).setFirstAppOpen(false);
 
         // Thiết lập adapter cho ViewPager2
         onboardingPagerAdapter = new OnboardingPagerAdapter(this);
@@ -32,7 +35,7 @@ public class OnboardingActivity extends AppCompatActivity {
     }
 
     public void navigateToMainActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
         finish(); // Đóng OnboardingActivity
     }

@@ -52,20 +52,20 @@ public class FavouriteFragment extends BaseFragment {
 
         // Prepare list items
         List<ProductItem> itemList = new ArrayList<>();
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
+//        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
+//        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
+//        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
+//        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
+//        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
+//        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
+//        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
+//        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
+//        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
+//        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
 
         // Set adapter
-        PopularAdapter popularAdapter = new PopularAdapter(context, itemList);
-        recyclerView.setAdapter(popularAdapter);
+//        PopularAdapter popularAdapter = new PopularAdapter(context, itemList);
+//        recyclerView.setAdapter(popularAdapter);
     }
 
 }

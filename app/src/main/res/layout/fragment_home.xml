@@ -126,6 +126,8 @@
                 tools:layout_editor_absoluteX="16dp">
 
                 <TextView
+                    android:id="@+id/layout_all"
+
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
@@ -137,6 +139,8 @@
                     android:textColor="@color/white" />
 
                 <TextView
+                    android:id="@+id/layout_men"
+
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
@@ -160,6 +164,7 @@
                     android:backgroundTint="@color/coloritem"
                     android:gravity="center"
                     android:padding="6dp"
+                    android:id="@+id/layout_women"
 
                     android:text="Women"
 
@@ -172,6 +177,7 @@
                     android:background="@drawable/tab_background"
                     android:backgroundTint="@color/coloritem"
                     android:gravity="center"
+                    android:id="@+id/layout_kids"
 
                     android:padding="6dp"
 
@@ -205,9 +211,10 @@
                 android:paddingHorizontal="16dp"
                 android:weightSum="5"
                 app:layout_constraintTop_toBottomOf="@+id/textView3"
-                tools:layout_editor_absoluteX="16dp">
+                tools:layout_editor_absoluteX="0dp">
 
                 <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/layout_zara"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -239,6 +246,8 @@
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/layout_gucci"
+
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -273,6 +282,8 @@
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/layout_stussy"
+
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -307,6 +318,8 @@
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/layout_nike"
+
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -341,6 +354,8 @@
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/layout_chanel"
+
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

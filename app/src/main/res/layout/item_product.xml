@@ -19,18 +19,19 @@
         android:src="@drawable/sampleimag" />
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/textViewName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="4dp"
         android:text="TitleTitleTitle"
         android:textColor="@color/black"
+        android:maxLines="1"
         android:textSize="18sp"
         android:textStyle="bold" />
 
     <!-- Second TextView -->
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/textViewBrand"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
@@ -42,7 +43,7 @@
 
     <!-- Third TextView -->
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/textViewPrice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"

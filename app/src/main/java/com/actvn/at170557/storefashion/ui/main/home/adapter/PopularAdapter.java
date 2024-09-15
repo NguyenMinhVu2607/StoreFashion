@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,10 +18,12 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.ViewHold
 
     private final List<ProductItem> itemList;
     private final LayoutInflater inflater;
+    private final OnItemClickListener onItemClickListener;
 
-    public PopularAdapter(Context context, List<ProductItem> itemList) {
+    public PopularAdapter(Context context, List<ProductItem> itemList, OnItemClickListener onItemClickListener) {
         this.inflater = LayoutInflater.from(context);
         this.itemList = itemList;
+        this.onItemClickListener = onItemClickListener;
     }
 
     @NonNull
@@ -35,10 +36,11 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ProductItem item = itemList.get(position);
-        holder.imageView.setImageResource(item.getImageResourceId());
-        holder.textView1.setText(item.getTitle());
-        holder.textView2.setText(item.getSubtitle());
-        holder.textView3.setText(item.getDescription());
+        holder.textViewName.setText(item.getName());
+        holder.textViewBrand.setText(item.getBrand());
+        holder.textViewPrice.setText("$" + item.getPrice());
+
+        holder.itemView.setOnClickListener(v -> onItemClickListener.onItemClick(item));
     }
 
     @Override
@@ -46,16 +48,18 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.ViewHold
         return itemList.size();
     }
 
+    public interface OnItemClickListener {
+        void onItemClick(ProductItem item);
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageView;
-        TextView textView1, textView2, textView3;
+        TextView textViewName, textViewBrand, textViewPrice;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.imageView);
-            textView1 = itemView.findViewById(R.id.textView1);
-            textView2 = itemView.findViewById(R.id.textView2);
-            textView3 = itemView.findViewById(R.id.textView3);
+            textViewName = itemView.findViewById(R.id.textViewName);
+            textViewBrand = itemView.findViewById(R.id.textViewBrand);
+            textViewPrice = itemView.findViewById(R.id.textViewPrice);
         }
     }
 }

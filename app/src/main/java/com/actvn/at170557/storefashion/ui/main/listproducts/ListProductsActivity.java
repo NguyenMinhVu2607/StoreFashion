@@ -1,19 +1,29 @@
 package com.actvn.at170557.storefashion.ui.main.listproducts;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
 import com.actvn.at170557.storefashion.R;
 import com.actvn.at170557.storefashion.databinding.ActivityListProductsBinding;
+import com.actvn.at170557.storefashion.ui.detailproduct.DetailProductActivity;
 import com.actvn.at170557.storefashion.ui.main.home.adapter.PopularAdapter;
 import com.actvn.at170557.storefashion.ui.main.home.model.ProductItem;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,25 +39,108 @@ public class ListProductsActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         context = getApplicationContext();
         hideNavigationBar();
-        List<ProductItem> itemList = new ArrayList<>();
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
+        String cateID = getIntent().getStringExtra("CATE");
+        String BrandID = getIntent().getStringExtra("Brand");
+        Log.d("ListProductsActivity", "cateID: " + cateID);
+        if (cateID != null) {
+            loadProductsCateFromFirestore(cateID);
+            binding.tvCate.setText(cateID);
 
-        // Set adapter
-        binding.recListpopular.setLayoutManager(new GridLayoutManager(context, 2));
-        PopularAdapter popularAdapter = new PopularAdapter(context, itemList);
-        binding.recListpopular.setAdapter(popularAdapter);
+        }
+        if (BrandID != null) {
+            loadProductsFromFirestore(BrandID);
+            binding.tvCate.setText(BrandID);
+//
+        }
+
 
         binding.imgBack.setOnClickListener(v -> finish());
     }
+    private void loadProductsFromFirestore(String BrandID) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference productsRef = db.collection("Products");
+
+        // Cập nhật truy vấn để lọc sản phẩm theo cateID
+        productsRef.whereEqualTo("brand", BrandID)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            List<ProductItem> itemList = new ArrayList<>();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                ProductItem product = document.toObject(ProductItem.class);
+                                product.setId(document.getId()); // Gán ID từ tài liệu
+
+                                itemList.add(product);
+
+                                // Ghi dữ liệu vào log
+                                Log.d("ProductItem", "Brand: " + product.getBrand());
+                                Log.d("ProductItem", "Description: " + product.getDescription());
+                                Log.d("ProductItem", "Name: " + product.getName());
+                                Log.d("ProductItem", "Price: " + product.getPrice());
+                                Log.d("ProductItem", "Sizes: " + (product.getSize() != null ? product.getSize().toString() : "No sizes available"));
+                            }
+
+                            // Đặt adapter sau khi lấy dữ liệu
+                            PopularAdapter popularAdapter = new PopularAdapter(context, itemList, item -> {
+                                Intent intent = new Intent(context, DetailProductActivity.class);
+                                intent.putExtra("PRODUCT_ID", item.getId()); // Truyền ID sản phẩm
+                                startActivity(intent);
+                            });
+                            binding.recListCate.setLayoutManager(new GridLayoutManager(context, 2));
+                            binding.recListCate.setAdapter(popularAdapter);
+                        } else {
+                            // Xử lý lỗi
+                            Log.d("ProductItem", "Lỗi khi lấy tài liệu: ", task.getException());
+                        }
+                    }
+                });
+    }
+
+    private void loadProductsCateFromFirestore(String cateID) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference productsRef = db.collection("Products");
+
+        // Cập nhật truy vấn để lọc sản phẩm theo cateID
+        productsRef.whereEqualTo("cate", cateID)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            List<ProductItem> itemList = new ArrayList<>();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                ProductItem product = document.toObject(ProductItem.class);
+                                product.setId(document.getId()); // Gán ID từ tài liệu
+
+                                itemList.add(product);
+
+                                // Ghi dữ liệu vào log
+                                Log.d("ProductItem", "Brand: " + product.getBrand());
+                                Log.d("ProductItem", "Description: " + product.getDescription());
+                                Log.d("ProductItem", "Name: " + product.getName());
+                                Log.d("ProductItem", "Price: " + product.getPrice());
+                                Log.d("ProductItem", "Sizes: " + (product.getSize() != null ? product.getSize().toString() : "No sizes available"));
+                            }
+
+                            // Đặt adapter sau khi lấy dữ liệu
+                            PopularAdapter popularAdapter = new PopularAdapter(context, itemList, item -> {
+                                Intent intent = new Intent(context, DetailProductActivity.class);
+                                intent.putExtra("PRODUCT_ID", item.getId()); // Truyền ID sản phẩm
+                                startActivity(intent);
+                            });
+                            binding.recListCate.setLayoutManager(new GridLayoutManager(context, 2));
+                            binding.recListCate.setAdapter(popularAdapter);
+                        } else {
+                            // Xử lý lỗi
+                            Log.d("ProductItem", "Lỗi khi lấy tài liệu: ", task.getException());
+                        }
+                    }
+                });
+    }
+
+
 
     protected void hideNavigationBar() {
         Window window = getWindow();

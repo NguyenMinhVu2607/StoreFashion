@@ -26,6 +26,8 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/tv_cate"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Men's"
@@ -33,14 +35,14 @@
             android:textSize="16dp"
             android:layout_marginTop="12dp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/rec_listpopular"
+            app:layout_constraintBottom_toTopOf="@+id/rec_listCate"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.42"
             app:layout_constraintStart_toEndOf="@+id/img_back"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rec_listpopular"
+            android:id="@+id/rec_listCate"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:padding="8dp"

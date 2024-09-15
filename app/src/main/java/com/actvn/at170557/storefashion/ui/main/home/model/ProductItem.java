@@ -1,34 +1,77 @@
 package com.actvn.at170557.storefashion.ui.main.home.model;
 
+import java.util.List;
+
 public class ProductItem {
-    public  int imageResourceId;
-    public  String title;
-    public  String subtitle;
-    public  String description;
+    private String id; // Add this field
+    private String brand;
+    private String description;
+    private String desciption;
+    private String name;
+    private String price;
+    private String cate;
 
-    public ProductItem(int imageResourceId, String title, String subtitle, String description) {
-        this.imageResourceId = imageResourceId;
-        this.title = title;
-        this.subtitle = subtitle;
-        this.description = description;
-    }
+    private List<String> size;
 
+    // Default constructor (required for Firestore)
     public ProductItem() {
     }
 
-    public int getImageResourceId() {
-        return imageResourceId;
+    public String getcate() {
+        return cate;
     }
 
-    public String getTitle() {
-        return title;
+    public void setcate(String cate) {
+        this.cate = cate;
     }
 
-    public String getSubtitle() {
-        return subtitle;
+    // Getter and Setter methods for id
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    // Getter and Setter methods for other fields
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
     }
 
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public List<String> getSize() {
+        return size;
+    }
+
+    public void setSize(List<String> size) {
+        this.size = size;
     }
 }

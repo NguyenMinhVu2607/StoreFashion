@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,10 +19,17 @@ import android.view.ViewGroup;
 import com.actvn.at170557.storefashion.R;
 import com.actvn.at170557.storefashion.baseapplication.BaseFragment;
 import com.actvn.at170557.storefashion.databinding.FragmentHomeBinding; // Import the generated binding class
+import com.actvn.at170557.storefashion.ui.detailproduct.DetailProductActivity;
 import com.actvn.at170557.storefashion.ui.main.home.adapter.PopularAdapter;
 import com.actvn.at170557.storefashion.ui.main.home.model.ProductItem;
 import com.actvn.at170557.storefashion.ui.main.listproducts.ListProductsActivity;
 import com.actvn.at170557.storefashion.ui.search.SearchActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +37,7 @@ import java.util.List;
 public class HomeFragment extends BaseFragment {
     private FragmentHomeBinding binding; // Use the generated binding class
     private Context context;
+    FirebaseFirestore db;
 
     @Override
     public int getLayoutFragment() {
@@ -45,28 +54,55 @@ public class HomeFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         context = getContext();
+        db = FirebaseFirestore.getInstance();
 
         // Initialize RecyclerView using ViewBinding
         RecyclerView recyclerView = binding.recPopular;
         recyclerView.setLayoutManager(new GridLayoutManager(context, 2)); // 2 columns
 
-        // Prepare list items
-        List<ProductItem> itemList = new ArrayList<>();
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-        itemList.add(new ProductItem(R.drawable.sampleimag, "Stussy T-Shirt", "Subtitle 1", "$100"));
-
-        // Set adapter
-        PopularAdapter popularAdapter = new PopularAdapter(context, itemList);
-        recyclerView.setAdapter(popularAdapter);
+        // Load products and set adapter
+        loadProductsFromFirestore();
     }
+
+    private void loadProductsFromFirestore() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference productsRef = db.collection("Products");
+
+        productsRef.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            List<ProductItem> itemList = new ArrayList<>();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                ProductItem product = document.toObject(ProductItem.class);
+                                product.setId(document.getId()); // Set the ID from the document
+
+                                itemList.add(product);
+
+                                // Log the data
+                                Log.d("ProductItem", "Brand: " + product.getBrand());
+                                Log.d("ProductItem", "Description: " + product.getDescription());
+                                Log.d("ProductItem", "Name: " + product.getName());
+                                Log.d("ProductItem", "Price: " + product.getPrice());
+                                Log.d("ProductItem", "Sizes: " + (product.getSize() != null ? product.getSize().toString() : "No sizes available"));
+                            }
+
+                            // Set adapter after fetching data
+                            PopularAdapter popularAdapter = new PopularAdapter(context, itemList, item -> {
+                                Intent intent = new Intent(context, DetailProductActivity.class);
+                                intent.putExtra("PRODUCT_ID", item.getId()); // Pass the product ID
+                                startActivity(intent);
+                            });
+                            binding.recPopular.setAdapter(popularAdapter);
+                        } else {
+                            // Handle error
+                            Log.d("ProductItem", "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+    }
+
 
     @Override
     public void onClickViews() {
@@ -75,10 +111,64 @@ public class HomeFragment extends BaseFragment {
             Intent intent = new Intent(context, SearchActivity.class);
             startActivity(intent);
         });
-        binding.layoutCate.setOnClickListener(v -> {
+        binding.layoutAll.setOnClickListener(v -> {
             Intent intent = new Intent(context, ListProductsActivity.class);
+            intent.putExtra("CATE", "ALL"); // Pass the product ID
+
             startActivity(intent);
         });
+        binding.layoutMen.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ListProductsActivity.class);
+            intent.putExtra("CATE", "MEN"); // Pass the product ID
+
+            startActivity(intent);
+        });
+        binding.layoutWomen.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ListProductsActivity.class);
+            intent.putExtra("CATE", "WOMEN"); // Pass the product ID
+
+            startActivity(intent);
+        });
+        binding.layoutKids.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ListProductsActivity.class);
+            intent.putExtra("CATE", "KIDS"); // Pass the product ID
+
+            startActivity(intent);
+        });
+
+
+        binding.layoutStussy.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ListProductsActivity.class);
+            intent.putExtra("Brand", "Stussy"); // Pass the product ID
+
+            startActivity(intent);
+        });
+        binding.layoutZara.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ListProductsActivity.class);
+            intent.putExtra("Brand", "Zara"); // Pass the product ID
+
+            startActivity(intent);
+        });
+        binding.layoutGucci.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ListProductsActivity.class);
+            intent.putExtra("Brand", "Gucci"); // Pass the product ID
+
+            startActivity(intent);
+        });
+        binding.layoutNike.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ListProductsActivity.class);
+            intent.putExtra("Brand", "Nike"); // Pass the product ID
+
+            startActivity(intent);
+        });
+        binding.layoutChanel.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ListProductsActivity.class);
+            intent.putExtra("Brand", "Chanel"); // Pass the product ID
+
+            startActivity(intent);
+        });
+
+
         binding.imgFilter.setOnClickListener(v -> {
             BottomFilter bottomFilter = new BottomFilter(context);
 
@@ -86,4 +176,6 @@ public class HomeFragment extends BaseFragment {
             bottomFilter.show();
         });
     }
+
+
 }
