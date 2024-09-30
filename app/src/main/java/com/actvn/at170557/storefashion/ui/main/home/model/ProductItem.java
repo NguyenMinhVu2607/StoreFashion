@@ -10,11 +10,20 @@ public class ProductItem {
     private String name;
     private String price;
     private String cate;
+    private String linkImg; // Thêm trường này
 
     private List<String> size;
 
     // Default constructor (required for Firestore)
     public ProductItem() {
+    }
+
+    public String getLinkImg() {
+        return linkImg;
+    }
+
+    public void setLinkImg(String linkImg) {
+        this.linkImg = linkImg;
     }
 
     public String getcate() {

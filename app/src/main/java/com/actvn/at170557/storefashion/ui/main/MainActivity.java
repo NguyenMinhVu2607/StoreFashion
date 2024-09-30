@@ -1,11 +1,13 @@
 package com.actvn.at170557.storefashion.ui.main;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -14,13 +16,16 @@ import android.view.WindowManager;
 import com.actvn.at170557.storefashion.R;
 import com.actvn.at170557.storefashion.baseapplication.BaseActivity;
 import com.actvn.at170557.storefashion.databinding.ActivityMainBinding;
+import com.actvn.at170557.storefashion.utils.SharedViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private ViewPager2 viewPager;
     private BottomNavigationView bottomNavigationView;
+    private SharedViewModel sharedViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +37,13 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
         setupViewPager(viewPager);
+//        sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
+
+        // Giả sử bạn nhận được UserID từ đâu đó và muốn đẩy nó vào ViewModel
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Lấy userId từ FirebaseAuth
+//        sharedViewModel.setUserId(userId);
+//        Log.d("MainActivity","userId : "+userId);
+
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
