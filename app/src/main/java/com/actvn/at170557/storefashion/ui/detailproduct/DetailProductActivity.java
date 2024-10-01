@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +16,8 @@ import android.widget.Toast;
 import com.actvn.at170557.storefashion.R;
 import com.actvn.at170557.storefashion.databinding.ActivityDetailProductBinding;
 import com.actvn.at170557.storefashion.ui.main.home.model.ProductItem;
+import com.actvn.at170557.storefashion.utils.FirebaseStorageHelper;
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -45,6 +48,26 @@ public class DetailProductActivity extends AppCompatActivity {
         textViewDescription = findViewById(R.id.textViewDescription);
         String productId = getIntent().getStringExtra("PRODUCT_ID");
         Log.d("DetailProductActivity", "productId: " + productId);
+        String pathIMG = "/img_product/" + productId + ".jpg";
+
+        FirebaseStorageHelper.getImageUri(pathIMG, new FirebaseStorageHelper.OnImageUriCallback() {
+            @Override
+            public void onImageUriReceived(Uri uri) {
+                if (uri != null) {
+                    // URI của ảnh đã được nhận
+                    String imageUrl = uri.toString();
+                    Log.d("imageUrl", "imageUrl:: " + imageUrl);
+                    Glide.with(getApplicationContext())
+                            .load(imageUrl)
+                            .placeholder(R.drawable.bg_load) // Placeholder image while loading
+                            .error(R.mipmap.ic_launcher) // Error image if loading fails
+                            .into(binding.imageViewProduct);
+                } else {
+                    Log.e("imageUrl", "imageUrl:: " );
+                }
+            }
+        });
+
         if (productId != null) {
             loadProductDetails(productId);
         }

@@ -61,8 +61,8 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.ViewHold
                     Log.d("imageUrl", "imageUrl:: " + imageUrl);
                     Glide.with(context)
                             .load(imageUrl)
-                            .placeholder(R.drawable.ic_launcher_background) // Placeholder image while loading
-                            .error(R.drawable.sampleimag) // Error image if loading fails
+                            .placeholder(R.drawable.bg_load) // Placeholder image while loading
+                            .error(R.mipmap.ic_launcher) // Error image if loading fails
                             .into(holder.imageViewPro);
                 } else {
                     Log.e("imageUrl", "imageUrl:: " );

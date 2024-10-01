@@ -89,6 +89,9 @@ public class MainActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager2 viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(this);
         viewPager.setAdapter(adapter);
+
+        // Đặt giới hạn lưu trữ trang (tùy chọn)
+        viewPager.setOffscreenPageLimit(1);  // Chỉ giữ 1 trang trong bộ nhớ
     }
 
     protected void hideNavigationBar() {

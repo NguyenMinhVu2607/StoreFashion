@@ -76,7 +76,8 @@ public class HomeFragment extends BaseFragment {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         // Ẩn ProgressBar
-//                        binding.progressBar.setVisibility(View.GONE);
+                        binding.progress.setVisibility(View.GONE);
+                        binding.recPopular.setVisibility(View.VISIBLE);
 
                         if (task.isSuccessful()) {
                             List<ProductItem> itemList = new ArrayList<>();

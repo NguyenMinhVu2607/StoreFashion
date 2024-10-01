@@ -11,12 +11,13 @@
     <!-- ImageView for displaying an image -->
 
     <!-- First TextView -->
+
     <ImageView
         android:id="@+id/imageViewPro"
         android:layout_width="match_parent"
         android:layout_height="180dp"
         android:scaleType="centerInside"
-        android:src="@drawable/sampleimag" />
+         />
 
     <TextView
         android:id="@+id/textViewName"

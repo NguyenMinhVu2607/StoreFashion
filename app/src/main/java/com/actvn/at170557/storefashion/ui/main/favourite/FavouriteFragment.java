@@ -124,7 +124,6 @@ public class FavouriteFragment extends BaseFragment {
     }
 
 
-
     private void displayFavoriteProducts(List<ProductItem> favoriteProducts) {
         Log.d("FavouriteFragment1", "favoriteProducts:  " + favoriteProducts.size());
 
@@ -138,6 +137,13 @@ public class FavouriteFragment extends BaseFragment {
             startActivity(intent);
         });
         binding.recFavourite.setAdapter(adapter);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        loadFavoriteProducts(userId);
     }
 
 

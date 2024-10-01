@@ -156,6 +156,7 @@
                     android:textColor="@color/black" />
 
                 <TextView
+                    android:id="@+id/layout_women"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
@@ -164,20 +165,19 @@
                     android:backgroundTint="@color/coloritem"
                     android:gravity="center"
                     android:padding="6dp"
-                    android:id="@+id/layout_women"
 
                     android:text="Women"
 
                     android:textColor="@color/black" />
 
                 <TextView
+                    android:id="@+id/layout_kids"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="4"
                     android:background="@drawable/tab_background"
                     android:backgroundTint="@color/coloritem"
                     android:gravity="center"
-                    android:id="@+id/layout_kids"
 
                     android:padding="6dp"
 
@@ -403,12 +403,24 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linearLayoutCompat" />
 
+            <ProgressBar
+                android:id="@+id/progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="56dp"
+                android:progressTint="@color/colorPrimary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rec_popular"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="16dp"
                 android:padding="8dp"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView4"
                 tools:layout_editor_absoluteX="16dp" />

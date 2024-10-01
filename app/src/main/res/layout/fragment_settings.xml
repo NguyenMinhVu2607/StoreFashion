@@ -4,24 +4,46 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
     android:background="@color/colorBG"
+    android:padding="16dp"
     tools:context=".ui.main.setting.SettingFragment">
 
-    <de.hdodenhof.circleimageview.CircleImageView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/circleImageView2"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginTop="40dp"
-        android:src="@drawable/ic_launcher_foreground"
+        app:cardCornerRadius="12dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeWidth="1dp">
+
+        <ImageView
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:src="@mipmap/ic_launcher" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:layout_width="00dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="@string/app_name"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/circleImageView2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/circleImageView2"
+        app:layout_constraintTop_toTopOf="@+id/circleImageView2"
+        app:layout_constraintVertical_bias="0.25" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="28dp"
         android:orientation="vertical"
         app:layout_constraintTop_toBottomOf="@+id/circleImageView2"
         tools:layout_editor_absoluteX="16dp">
@@ -32,11 +54,13 @@
             android:orientation="horizontal">
 
             <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/avatar"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:src="@drawable/imgtest" />
 
             <TextView
+                android:id="@+id/txt_userName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -48,6 +72,7 @@
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/layout_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
@@ -71,6 +96,8 @@
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/layout_mycart"
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -120,6 +147,8 @@
         <!--        </androidx.appcompat.widget.LinearLayoutCompat>-->
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/layout_contactUs"
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -145,6 +174,8 @@
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/layout_policy"
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -168,6 +199,8 @@
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/layout_FAQ"
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -190,6 +223,19 @@
                 android:textStyle="normal" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="24dp"
+            app:cardCornerRadius="12dp"
+            app:strokeWidth="1dp">
+
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/mapView"
+                android:layout_width="match_parent"
+                android:layout_height="200dp" />
+        </com.google.android.material.card.MaterialCardView>
         <!--        <androidx.appcompat.widget.LinearLayoutCompat-->
         <!--            android:layout_width="match_parent"-->
         <!--            android:layout_height="wrap_content"-->
