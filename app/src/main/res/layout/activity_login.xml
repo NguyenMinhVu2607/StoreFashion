@@ -64,27 +64,49 @@
         app:layout_constraintTop_toBottomOf="@+id/subheading_text" />
 
     <!-- Password EditText -->
-    <EditText
-        android:id="@+id/password_edittext"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_pass"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/edittext_bg"
         android:backgroundTint="#F4F4F4"
-        android:drawableStart="@drawable/ic_lock"
-        android:drawableEnd="@drawable/ic_eye"
-        android:drawablePadding="8dp"
-
-        android:drawableTint="@color/colorPrimary"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:padding="16dp"
-        android:textColor="@color/black"
-        android:textColorHint="@color/color_neutral04"
         app:layout_constraintEnd_toEndOf="parent"
+
+
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/email_edittext" />
+        app:layout_constraintTop_toBottomOf="@+id/email_edittext">
+
+        <EditText
+            android:id="@+id/password_edittext"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:backgroundTint="#F4F4F4"
+            android:drawableStart="@drawable/ic_lock"
+            android:drawablePadding="8dp"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:padding="16dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/color_neutral04"
+            app:layout_constraintEnd_toStartOf="@+id/password_eye_icon"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
+            android:id="@+id/password_eye_icon"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:tint="@color/colorPrimary"
+            android:src="@drawable/ic_eye"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Forgot Password Text -->
     <TextView
@@ -97,7 +119,7 @@
         android:textColor="@color/colorPrimary"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password_edittext" />
+        app:layout_constraintTop_toBottomOf="@+id/layout_pass" />
 
     <Button
         android:id="@+id/login_button"

@@ -78,6 +78,7 @@
                 android:textSize="16dp" />
 
             <TextView
+                android:id="@+id/tv_total_amount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="$730"
@@ -100,6 +101,8 @@
                 android:textSize="16dp" />
 
             <TextView
+                android:id="@+id/shipping_fee"
+
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Free"
@@ -132,6 +135,8 @@
                 tools:layout_editor_absoluteY="0dp" />
 
             <TextView
+                android:id="@+id/tv_grand_total"
+
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="$730"

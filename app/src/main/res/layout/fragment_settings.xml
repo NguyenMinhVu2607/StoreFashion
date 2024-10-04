@@ -40,6 +40,23 @@
         app:layout_constraintTop_toTopOf="@+id/circleImageView2"
         app:layout_constraintVertical_bias="0.25" />
 
+    <TextView
+        android:id="@+id/logout"
+        android:layout_width="00dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="Log out of account"
+        android:textColor="#E91E63"
+        android:textSize="16dp"
+        android:textStyle="bold"
+        android:paddingVertical="6dp"
+        app:layout_constraintBottom_toBottomOf="@+id/circleImageView2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/circleImageView2"
+        app:layout_constraintTop_toTopOf="@+id/circleImageView2"
+        app:layout_constraintVertical_bias="1.0" />
+
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

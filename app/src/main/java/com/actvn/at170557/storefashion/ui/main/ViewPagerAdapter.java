@@ -1,5 +1,7 @@
 package com.actvn.at170557.storefashion.ui.main;
 
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -12,8 +14,11 @@ import com.actvn.at170557.storefashion.ui.main.setting.SettingFragment;
 
 public class ViewPagerAdapter extends FragmentStateAdapter {
 
-    public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
+    private String userId; // Thêm thuộc tính để lưu userId
+
+    public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, String userId) {
         super(fragmentActivity);
+        this.userId = userId; // Khởi tạo userId
     }
 
     @NonNull
@@ -25,7 +30,12 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
             case 1:
                 return new FavouriteFragment();
             case 2:
-                return new MyCartFragment();
+                MyCartFragment myCartFragment = new MyCartFragment();
+                // Đặt userId vào Bundle và truyền cho MyCartFragment
+                Bundle bundle = new Bundle();
+                bundle.putString("USER_ID", userId);
+                myCartFragment.setArguments(bundle);
+                return myCartFragment;
             case 3:
                 return new SettingFragment();
             default:
@@ -41,13 +51,11 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
     // Thêm các phương thức này để đảm bảo Fragment luôn được tạo lại
     @Override
     public long getItemId(int position) {
-        // Trả về vị trí của trang
-        return position;
+        return position; // Trả về vị trí của trang
     }
 
     @Override
     public boolean containsItem(long itemId) {
-        // Trả về false để buộc ViewPager2 tạo lại Fragment
-        return false;
+        return false; // Trả về false để buộc ViewPager2 tạo lại Fragment
     }
 }

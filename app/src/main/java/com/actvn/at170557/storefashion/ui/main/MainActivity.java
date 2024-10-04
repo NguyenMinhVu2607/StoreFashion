@@ -16,6 +16,7 @@ import android.view.WindowManager;
 import com.actvn.at170557.storefashion.R;
 import com.actvn.at170557.storefashion.baseapplication.BaseActivity;
 import com.actvn.at170557.storefashion.databinding.ActivityMainBinding;
+import com.actvn.at170557.storefashion.ui.main.mycart.MyCartFragment;
 import com.actvn.at170557.storefashion.utils.SharedViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -87,12 +88,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupViewPager(ViewPager2 viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(this);
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Lấy userId từ FirebaseAuth
+        ViewPagerAdapter adapter = new ViewPagerAdapter(this, userId); // Truyền userId vào adapter
         viewPager.setAdapter(adapter);
-
-        // Đặt giới hạn lưu trữ trang (tùy chọn)
-        viewPager.setOffscreenPageLimit(1);  // Chỉ giữ 1 trang trong bộ nhớ
     }
+
 
     protected void hideNavigationBar() {
         Window window = getWindow();

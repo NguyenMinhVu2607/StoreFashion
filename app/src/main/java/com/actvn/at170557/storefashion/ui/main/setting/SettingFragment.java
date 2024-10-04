@@ -19,12 +19,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actvn.at170557.storefashion.R;
 import com.actvn.at170557.storefashion.baseapplication.BaseFragment;
 import com.actvn.at170557.storefashion.databinding.FragmentSettingsBinding;
 import com.actvn.at170557.storefashion.ui.address.ListAddressActivity;
+import com.actvn.at170557.storefashion.ui.login_signup.LoginActivity;
 import com.actvn.at170557.storefashion.ui.main.mycart.MyCartFragment;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -37,6 +39,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class SettingFragment extends BaseFragment implements OnMapReadyCallback {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 102;
@@ -76,6 +79,19 @@ public class SettingFragment extends BaseFragment implements OnMapReadyCallback 
         mapView = binding.mapView; // Giả sử bạn đã thêm MapView vào layout
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this); // Thay đổi ở đây
+        binding.logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Toast.makeText(context, "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+
+                // Redirect to login activity after logging out
+                Intent intent = new Intent(getContext(), LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                getActivity().finish(); // Close the current activity
+            }
+        });
 
         binding.layoutAddress.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -136,7 +152,6 @@ public class SettingFragment extends BaseFragment implements OnMapReadyCallback 
                 .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
-                        // Vị trí đã được lấy thành công
                         if (location != null) {
                             double latitude = location.getLatitude();
                             double longitude = location.getLongitude();

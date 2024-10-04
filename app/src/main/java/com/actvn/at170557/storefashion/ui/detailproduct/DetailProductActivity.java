@@ -24,15 +24,19 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DetailProductActivity extends AppCompatActivity {
     private ActivityDetailProductBinding binding;
     private TextView textViewName, textViewBrand, textViewPrice, textViewDescription;
     private int currentValue = 1;
     private final int MIN_VALUE = 1;
-    private final int MAX_VALUE = 10; // Đặt giá trị tối đa bạn muốn
-    private String userId; // ID của người dùng hiện tại
+    private final int MAX_VALUE = 10;
+    private String userId;
+    private String selectedSize = "S"; // Default size, update this based on selection
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,12 +44,14 @@ public class DetailProductActivity extends AppCompatActivity {
         binding = ActivityDetailProductBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         hideNavigationBar();
-        userId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Lấy userId từ FirebaseAuth
+
+        userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         textViewName = findViewById(R.id.textViewName);
         textViewBrand = findViewById(R.id.textViewBrand);
         textViewPrice = findViewById(R.id.textViewPrice);
         textViewDescription = findViewById(R.id.textViewDescription);
+
         String productId = getIntent().getStringExtra("PRODUCT_ID");
         Log.d("DetailProductActivity", "productId: " + productId);
         String pathIMG = "/img_product/" + productId + ".jpg";
@@ -54,16 +60,13 @@ public class DetailProductActivity extends AppCompatActivity {
             @Override
             public void onImageUriReceived(Uri uri) {
                 if (uri != null) {
-                    // URI của ảnh đã được nhận
                     String imageUrl = uri.toString();
                     Log.d("imageUrl", "imageUrl:: " + imageUrl);
                     Glide.with(getApplicationContext())
                             .load(imageUrl)
-                            .placeholder(R.drawable.bg_load) // Placeholder image while loading
-                            .error(R.mipmap.ic_launcher) // Error image if loading fails
+                            .placeholder(R.drawable.bg_load)
+                            .error(R.mipmap.ic_launcher)
                             .into(binding.imageViewProduct);
-                } else {
-                    Log.e("imageUrl", "imageUrl:: " );
                 }
             }
         });
@@ -88,27 +91,24 @@ public class DetailProductActivity extends AppCompatActivity {
                 updateValueDisplay();
             }
         });
-        // Tạo một phương thức để đổi nền khi TextView được click
-        View.OnClickListener onClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Đặt tất cả TextView về trạng thái nền mặc định
-                binding.textViewS.setBackgroundResource(R.drawable.circular_background);
-                binding.textViewM.setBackgroundResource(R.drawable.circular_background);
-                binding.textViewL.setBackgroundResource(R.drawable.circular_background);
-                binding.textViewXL.setBackgroundResource(R.drawable.circular_background);
-//                binding.textViewS.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
-//                binding.textViewM.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
-//                binding.textViewL.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
-//                binding.textViewXL.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
 
+        // Size selection listener
+        View.OnClickListener onClickListener = view -> {
+            resetSizeSelection();
+            view.setBackgroundResource(R.drawable.circular_background_selected);
 
-                // Đổi nền của TextView đã được click
-                view.setBackgroundResource(R.drawable.circular_background_selected);
+            if (view.getId() == R.id.textViewS) {
+                selectedSize = "S";
+            } else if (view.getId() == R.id.textViewM) {
+                selectedSize = "M";
+            } else if (view.getId() == R.id.textViewL) {
+                selectedSize = "L";
+            } else if (view.getId() == R.id.textViewXL) {
+                selectedSize = "XL";
             }
+
         };
 
-// Đặt sự kiện click cho từng TextView
         binding.textViewS.setOnClickListener(onClickListener);
         binding.textViewM.setOnClickListener(onClickListener);
         binding.textViewL.setOnClickListener(onClickListener);
@@ -116,6 +116,15 @@ public class DetailProductActivity extends AppCompatActivity {
 
         binding.imageViewLikeProduct.setOnClickListener(v -> {
             toggleFavoriteStatus(productId);
+        });
+
+        // Add to Cart button logic
+        binding.AddToCard.setOnClickListener(v -> {
+            String productName = textViewName.getText().toString();
+            double productPrice = Double.parseDouble(textViewPrice.getText().toString().replace("$", ""));
+            String imageUrl = pathIMG; // Use the pathIMG or the URL retrieved from Firebase Storage
+
+            addToCart(productId, productName, selectedSize, productPrice, currentValue, imageUrl);
         });
     }
 
@@ -133,14 +142,8 @@ public class DetailProductActivity extends AppCompatActivity {
                         textViewBrand.setText("Brand: " + product.getBrand());
                         textViewPrice.setText("$" + product.getPrice());
                         String description = product.getDescription();
-
-                        // Thay thế "\\n" nếu bạn lưu trữ nó như một chuỗi thoát
                         description = description.replace("\\n", "\n");
-
-                        // Đặt văn bản cho TextView
                         textViewDescription.setText(description);
-                        Log.d("DetailProductActivity", "getDescription: " + product.getDescription());
-
                     }
                 }
             } else {
@@ -153,6 +156,12 @@ public class DetailProductActivity extends AppCompatActivity {
         binding.textViewValue.setText(String.valueOf(currentValue));
     }
 
+    private void resetSizeSelection() {
+        binding.textViewS.setBackgroundResource(R.drawable.circular_background);
+        binding.textViewM.setBackgroundResource(R.drawable.circular_background);
+        binding.textViewL.setBackgroundResource(R.drawable.circular_background);
+        binding.textViewXL.setBackgroundResource(R.drawable.circular_background);
+    }
 
     private void checkIfFavorite(String productId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -160,20 +169,16 @@ public class DetailProductActivity extends AppCompatActivity {
 
         userRef.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
-                // Lấy danh sách favorites hiện tại
                 List<String> favorites = (List<String>) documentSnapshot.get("favorites");
                 if (favorites != null && favorites.contains(productId)) {
-                    // Đổi icon thành đã yêu thích
                     binding.imageViewLikeProduct.setImageResource(R.drawable.ic_favourite_selectd);
                 } else {
-                    // Đổi icon thành chưa yêu thích
                     binding.imageViewLikeProduct.setImageResource(R.drawable.ic_favourite_unselectd);
                 }
             }
         });
     }
 
-    // Thêm hoặc xóa sản phẩm khỏi danh sách yêu thích
     private void toggleFavoriteStatus(String productId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference userRef = db.collection("Users").document(userId);
@@ -183,25 +188,80 @@ public class DetailProductActivity extends AppCompatActivity {
                 List<String> favorites = (List<String>) documentSnapshot.get("favorites");
 
                 if (favorites != null && favorites.contains(productId)) {
-                    // Nếu sản phẩm đã trong danh sách yêu thích, xóa nó
                     userRef.update("favorites", FieldValue.arrayRemove(productId))
                             .addOnSuccessListener(aVoid -> {
-                                // Cập nhật icon và hiển thị thông báo
                                 binding.imageViewLikeProduct.setImageResource(R.drawable.ic_favourite_unselectd);
-                                Toast.makeText(getApplicationContext(), "Đã xóa khỏi yêu thích", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Removed from favorites", Toast.LENGTH_SHORT).show();
                             });
                 } else {
-                    // Nếu sản phẩm chưa có, thêm nó vào danh sách yêu thích
                     userRef.update("favorites", FieldValue.arrayUnion(productId))
                             .addOnSuccessListener(aVoid -> {
-                                // Cập nhật icon và hiển thị thông báo
                                 binding.imageViewLikeProduct.setImageResource(R.drawable.ic_favourite_selectd);
-                                Toast.makeText(getApplicationContext(), "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Added to favorites", Toast.LENGTH_SHORT).show();
                             });
                 }
             }
         });
     }
+
+    // Add product to cart
+    private void addToCart(String productId, String productName, String productSize, double productPrice, int quantity, String imageUrl) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference cartRef = db.collection("Cart").document(userId);
+
+        cartRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    List<Map<String, Object>> cartItems = (List<Map<String, Object>>) document.get("items");
+
+                    boolean isProductFound = false;
+
+                    for (Map<String, Object> item : cartItems) {
+                        if (item.get("productId").equals(productId) && item.get("size").equals(productSize)) {
+                            int currentQuantity = ((Long) item.get("quantity")).intValue();
+                            item.put("quantity", currentQuantity + quantity);
+                            isProductFound = true;
+                            break;
+                        }
+                    }
+
+                    if (!isProductFound) {
+                        Map<String, Object> newItem = new HashMap<>();
+                        newItem.put("productId", productId);
+                        newItem.put("name", productName);
+                        newItem.put("size", productSize);
+                        newItem.put("price", productPrice);
+                        newItem.put("quantity", quantity);
+                        newItem.put("imageUrl", imageUrl);
+                        cartItems.add(newItem);
+                    }
+
+                    cartRef.update("items", cartItems)
+                            .addOnSuccessListener(aVoid -> Toast.makeText(this, "Product added to cart", Toast.LENGTH_SHORT).show())
+                            .addOnFailureListener(e -> Toast.makeText(this, "Error adding product", Toast.LENGTH_SHORT).show());
+                } else {
+                    List<Map<String, Object>> newCartItems = new ArrayList<>();
+                    Map<String, Object> newItem = new HashMap<>();
+                    newItem.put("productId", productId);
+                    newItem.put("name", productName);
+                    newItem.put("size", productSize);
+                    newItem.put("price", productPrice);
+                    newItem.put("quantity", quantity);
+                    newItem.put("imageUrl", imageUrl);
+                    newCartItems.add(newItem);
+
+                    Map<String, Object> cartData = new HashMap<>();
+                    cartData.put("items", newCartItems);
+
+                    cartRef.set(cartData)
+                            .addOnSuccessListener(aVoid -> Toast.makeText(this, "Cart created and product added", Toast.LENGTH_SHORT).show())
+                            .addOnFailureListener(e -> Toast.makeText(this, "Error creating cart", Toast.LENGTH_SHORT).show());
+                }
+            }
+        });
+    }
+
     protected void hideNavigationBar() {
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);

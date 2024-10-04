@@ -1,6 +1,8 @@
 package com.actvn.at170557.storefashion.ui.main.mycart;
 
 import android.content.Context;
+import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +11,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.actvn.at170557.storefashion.R;
+import com.actvn.at170557.storefashion.utils.FirebaseStorageHelper;
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 // CartAdapter class for handling RecyclerView in MyCartsActivity
@@ -29,11 +34,25 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         return new CartViewHolder(view);
     }
 
-    @Override
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
         CartItem item = cartItemList.get(position);
-        holder.imageView.setImageResource(item.getImageResource());
-        holder.titleTextView.setText(item.getTitle());
+        // Tải ảnh từ URL
+        FirebaseStorageHelper.getImageUri(item.getImageUrl(), new FirebaseStorageHelper.OnImageUriCallback() {
+            @Override
+            public void onImageUriReceived(Uri uri) {
+                if (uri != null) {
+                    String imageUrl = uri.toString();
+                    Log.d("imageUrl", "imageUrl:: " + imageUrl);
+                    Glide.with(context)
+                            .load(imageUrl)
+                            .placeholder(R.drawable.bg_load)
+                            .error(R.mipmap.ic_launcher)
+                            .into(holder.imageView);
+                }
+            }
+        });
+        holder.cart_item_size.setText("Size: "+item.getSize());
+        holder.titleTextView.setText(item.getName());
         holder.priceTextView.setText(item.getPrice());
         holder.quantityTextView.setText(item.getQuantity());
     }
@@ -45,11 +64,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
     public static class CartViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
-        TextView titleTextView, priceTextView, quantityTextView;
+        TextView titleTextView, priceTextView, quantityTextView,cart_item_size;
 
         public CartViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.cart_item_image);
+            cart_item_size = itemView.findViewById(R.id.cart_item_size);
             titleTextView = itemView.findViewById(R.id.cart_item_title);
             priceTextView = itemView.findViewById(R.id.cart_item_price);
             quantityTextView = itemView.findViewById(R.id.cart_item_quantity);

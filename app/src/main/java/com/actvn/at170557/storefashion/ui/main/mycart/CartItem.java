@@ -1,57 +1,39 @@
 package com.actvn.at170557.storefashion.ui.main.mycart;
 
 public class CartItem {
-    private int imageResource;
-    private String title;
+    private String imageUrl;
+    private String name;
     private String size;
     private String price;
     private String quantity;
 
-    public CartItem(int imageResource, String title, String size, String price, String quantity) {
-        this.imageResource = imageResource;
-        this.title = title;
+    // Constructor
+    public CartItem(String imageUrl, String name, String size, String price, String quantity) {
+        this.imageUrl = imageUrl;
+        this.name = name;
         this.size = size;
         this.price = price;
         this.quantity = quantity;
     }
 
-    public int getImageResource() {
-        return imageResource;
+    // Getters
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setImageResource(int imageResource) {
-        this.imageResource = imageResource;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
+    public String getName() {
+        return name;
     }
 
     public String getSize() {
         return size;
     }
 
-    public void setSize(String size) {
-        this.size = size;
-    }
-
     public String getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
-        this.price = price;
-    }
-
     public String getQuantity() {
         return quantity;
-    }
-
-    public void setQuantity(String quantity) {
-        this.quantity = quantity;
     }
 }

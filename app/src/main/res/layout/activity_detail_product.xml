@@ -282,14 +282,14 @@
                 android:src="@drawable/ic_favourite_selectd"
                 android:tint="#FA76A3"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/textView10"
+                app:layout_constraintEnd_toStartOf="@+id/AddToCard"
                 app:layout_constraintHorizontal_bias="0.34"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.384" />
 
             <TextView
-                android:id="@+id/textView10"
+                android:id="@+id/AddToCard"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/tab_background"

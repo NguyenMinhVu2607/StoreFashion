@@ -19,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.actvn.at170557.storefashion.R;
+import com.actvn.at170557.storefashion.ui.main.MainActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -38,9 +39,10 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText emailEditText, passwordEditText, confirmPasswordEditText;
     private ImageView togglePasswordView, toggleConfirmPasswordView;
     private Button signUpButton;
-TextView user_name;
+    TextView user_name;
     private boolean isPasswordVisible = false, isConfirmPasswordVisible = false;
     FirebaseFirestore db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,7 +83,7 @@ TextView user_name;
                 createAccount();
             }
         });
-        TextView login_text =findViewById(R.id.login_text);
+        TextView login_text = findViewById(R.id.login_text);
         login_text.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,7 +112,15 @@ TextView user_name;
         String email = emailEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
         String confirmPassword = confirmPasswordEditText.getText().toString().trim();
+        String userName = user_name.getText().toString().trim();
 
+        // Check for potential SQL injection in email, password, and userName
+        if (containsSqlInjectionRisk(email) || containsSqlInjectionRisk(password) || containsSqlInjectionRisk(userName)) {
+            showToast("Thông tin nhập vào không hợp lệ.");
+            return;
+        }
+
+        // Kiểm tra tính hợp lệ của email
         if (TextUtils.isEmpty(email)) {
             emailEditText.setError("Email không được để trống.");
             return;
@@ -121,6 +131,7 @@ TextView user_name;
             return;
         }
 
+        // Kiểm tra tính hợp lệ của mật khẩu
         if (TextUtils.isEmpty(password)) {
             passwordEditText.setError("Mật khẩu không được để trống.");
             return;
@@ -136,6 +147,11 @@ TextView user_name;
             return;
         }
 
+        if (TextUtils.isEmpty(userName)) {
+            showToast("Tên người dùng không được để trống.");
+            return;
+        }
+
         // Tạo tài khoản bằng Firebase Authentication
         ProgressDialog progressDialog = new ProgressDialog(SignUpActivity.this);
         progressDialog.setMessage("Đang xử lý đăng ký...");
@@ -146,29 +162,20 @@ TextView user_name;
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        // Ẩn ProgressDialog sau khi hoàn thành
                         progressDialog.dismiss();
 
                         if (task.isSuccessful()) {
-                            // Lấy user ID sau khi đăng ký thành công
                             FirebaseUser user = mAuth.getCurrentUser();
                             String userId = user.getUid();
-                            String userName = user_name.getText().toString().trim();
 
-                            // Kiểm tra tên người dùng
-                            if (userName.isEmpty()) {
-                                Toast.makeText(SignUpActivity.this, "Tên người dùng không được để trống.", Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-
-                            // Thêm người dùng mới vào Firestore trong collection "Users" với userId là document ID
+                            // Thêm người dùng mới vào Firestore
                             db.collection("Users").document(userId)
-                                    .set(new User(userName))  // Trực tiếp thêm đối tượng User mới với tên
+                                    .set(new User(userName))
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            Toast.makeText(SignUpActivity.this, "Tài khoản đã được tạo thành công và lưu trữ dữ liệu người dùng.", Toast.LENGTH_SHORT).show();
-                                            finish();
+                                            Toast.makeText(SignUpActivity.this, "Tài khoản đã được tạo thành công. Hãy đăng nhập.", Toast.LENGTH_SHORT).show();
+                                            navigateToLoginActivity();
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
@@ -177,15 +184,29 @@ TextView user_name;
                                             Toast.makeText(SignUpActivity.this, "Đăng ký thành công nhưng lỗi khi lưu dữ liệu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                         }
                                     });
-
                         } else {
-                            // Đăng ký thất bại
                             Toast.makeText(SignUpActivity.this, "Đăng ký thất bại: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
-
     }
+
+    // Phương thức để phát hiện các ký tự có khả năng gây ra SQL injection
+    private boolean containsSqlInjectionRisk(String input) {
+        String[] dangerousCharacters = {"'", "\"", ";", "--", "/*", "*/", "#", "="};
+
+        for (String character : dangerousCharacters) {
+            if (input.contains(character)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
 
     // Phương thức chuyển đổi giữa hiển thị và ẩn mật khẩu
     private void togglePasswordVisibility() {
@@ -216,9 +237,10 @@ TextView user_name;
         confirmPasswordEditText.setSelection(confirmPasswordEditText.length());
     }
 
-    public void navigateToRESActivity() {
+    public void navigateToLoginActivity() {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
         finish();
     }
+
 }
