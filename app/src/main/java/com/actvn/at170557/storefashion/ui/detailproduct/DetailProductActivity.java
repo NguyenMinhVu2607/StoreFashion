@@ -215,18 +215,40 @@ public class DetailProductActivity extends AppCompatActivity {
                 if (document.exists()) {
                     List<Map<String, Object>> cartItems = (List<Map<String, Object>>) document.get("items");
 
-                    boolean isProductFound = false;
+                    if (cartItems != null) {
+                        boolean isProductFound = false;
 
-                    for (Map<String, Object> item : cartItems) {
-                        if (item.get("productId").equals(productId) && item.get("size").equals(productSize)) {
-                            int currentQuantity = ((Long) item.get("quantity")).intValue();
-                            item.put("quantity", currentQuantity + quantity);
-                            isProductFound = true;
-                            break;
+                        for (Map<String, Object> item : cartItems) {
+                            // Kiểm tra item không null và các trường không null
+                            if (item != null && item.get("productId") != null && item.get("size") != null) {
+                                if (item.get("productId").equals(productId) && item.get("size").equals(productSize)) {
+                                    int currentQuantity = ((Long) item.get("quantity")).intValue(); // Chuyển đổi Long thành int
+                                    item.put("quantity", currentQuantity + quantity); // Cộng dồn số lượng
+                                    isProductFound = true;
+                                    break; // Thoát vòng lặp nếu đã tìm thấy
+                                }
+                            }
                         }
-                    }
 
-                    if (!isProductFound) {
+                        if (!isProductFound) {
+                            // Nếu sản phẩm không tồn tại, thêm sản phẩm mới vào giỏ hàng
+                            Map<String, Object> newItem = new HashMap<>();
+                            newItem.put("productId", productId);
+                            newItem.put("name", productName);
+                            newItem.put("size", productSize);
+                            newItem.put("price", productPrice);
+                            newItem.put("quantity", quantity);
+                            newItem.put("imageUrl", imageUrl);
+                            cartItems.add(newItem); // Thêm sản phẩm mới vào danh sách
+                        }
+
+                        // Cập nhật giỏ hàng trong Firestore
+                        cartRef.update("items", cartItems)
+                                .addOnSuccessListener(aVoid -> Toast.makeText(this, "Product added to cart", Toast.LENGTH_SHORT).show())
+                                .addOnFailureListener(e -> Toast.makeText(this, "Error adding product", Toast.LENGTH_SHORT).show());
+                    } else {
+                        // Xử lý trường hợp cartItems là null
+                        List<Map<String, Object>> newCartItems = new ArrayList<>();
                         Map<String, Object> newItem = new HashMap<>();
                         newItem.put("productId", productId);
                         newItem.put("name", productName);
@@ -234,13 +256,17 @@ public class DetailProductActivity extends AppCompatActivity {
                         newItem.put("price", productPrice);
                         newItem.put("quantity", quantity);
                         newItem.put("imageUrl", imageUrl);
-                        cartItems.add(newItem);
-                    }
+                        newCartItems.add(newItem);
 
-                    cartRef.update("items", cartItems)
-                            .addOnSuccessListener(aVoid -> Toast.makeText(this, "Product added to cart", Toast.LENGTH_SHORT).show())
-                            .addOnFailureListener(e -> Toast.makeText(this, "Error adding product", Toast.LENGTH_SHORT).show());
+                        Map<String, Object> cartData = new HashMap<>();
+                        cartData.put("items", newCartItems);
+
+                        cartRef.set(cartData)
+                                .addOnSuccessListener(aVoid -> Toast.makeText(this, "Cart created and product added", Toast.LENGTH_SHORT).show())
+                                .addOnFailureListener(e -> Toast.makeText(this, "Error creating cart", Toast.LENGTH_SHORT).show());
+                    }
                 } else {
+                    // Trường hợp document không tồn tại
                     List<Map<String, Object>> newCartItems = new ArrayList<>();
                     Map<String, Object> newItem = new HashMap<>();
                     newItem.put("productId", productId);
@@ -258,6 +284,9 @@ public class DetailProductActivity extends AppCompatActivity {
                             .addOnSuccessListener(aVoid -> Toast.makeText(this, "Cart created and product added", Toast.LENGTH_SHORT).show())
                             .addOnFailureListener(e -> Toast.makeText(this, "Error creating cart", Toast.LENGTH_SHORT).show());
                 }
+            } else {
+                // Xử lý lỗi khi không lấy được tài liệu
+                Toast.makeText(this, "Error fetching cart data", Toast.LENGTH_SHORT).show();
             }
         });
     }

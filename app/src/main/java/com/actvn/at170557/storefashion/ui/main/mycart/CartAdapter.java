@@ -21,10 +21,22 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
     private Context context;
     private List<CartItem> cartItemList;
+    private OnCartItemDeleteListener deleteListener;
+    private OnCartItemActionListener actionlistener;
 
-    public CartAdapter(Context context, List<CartItem> cartItemList) {
+    // Interface to communicate actions to the Fragment
+    public interface OnCartItemActionListener {
+        void onAddQuantity(CartItem cartItem, int position);
+        void onRemoveQuantity(CartItem cartItem, int position);
+    }
+    public interface OnCartItemDeleteListener {
+        void onCartItemDelete(int position, CartItem item);
+    }
+    public CartAdapter(Context context, List<CartItem> cartItemList, OnCartItemDeleteListener deleteListener ,OnCartItemActionListener actionlistener ) {
         this.context = context;
         this.cartItemList = cartItemList;
+        this.deleteListener = deleteListener;
+        this.actionlistener = actionlistener;
     }
 
     @NonNull
@@ -55,6 +67,18 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         holder.titleTextView.setText(item.getName());
         holder.priceTextView.setText(item.getPrice());
         holder.quantityTextView.setText(item.getQuantity());
+        holder.removeCityButton.setOnClickListener(v -> {
+            // Notify fragment about the delete action
+            deleteListener.onCartItemDelete(position, item);
+        });
+        holder.add_a_product.setOnClickListener(v -> {
+            actionlistener.onAddQuantity(item, position); // Notify Fragment when clicked
+        });
+
+        // Handle Minus button
+        holder.minus_a_product.setOnClickListener(v -> {
+            actionlistener.onRemoveQuantity(item, position); // Notify Fragment when clicked
+        });
     }
 
     @Override
@@ -63,12 +87,16 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     }
 
     public static class CartViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageView;
+        ImageView imageView,add_a_product,minus_a_product;
+        ImageView removeCityButton;
         TextView titleTextView, priceTextView, quantityTextView,cart_item_size;
 
         public CartViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.cart_item_image);
+            add_a_product = itemView.findViewById(R.id.add_a_product);
+            minus_a_product = itemView.findViewById(R.id.minus_a_product);
+            removeCityButton = itemView.findViewById(R.id.removeCityButton);
             cart_item_size = itemView.findViewById(R.id.cart_item_size);
             titleTextView = itemView.findViewById(R.id.cart_item_title);
             priceTextView = itemView.findViewById(R.id.cart_item_price);

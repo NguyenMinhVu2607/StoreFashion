@@ -48,14 +48,14 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
         return 4; // Số lượng trang (4)
     }
 
-    // Thêm các phương thức này để đảm bảo Fragment luôn được tạo lại
-    @Override
-    public long getItemId(int position) {
-        return position; // Trả về vị trí của trang
-    }
-
-    @Override
-    public boolean containsItem(long itemId) {
-        return false; // Trả về false để buộc ViewPager2 tạo lại Fragment
-    }
+//    @Override
+//    public long getItemId(int position) {
+//        return position; // Trả về vị trí của trang
+//    }
+//
+//
+//    @Override
+//    public boolean containsItem(long itemId) {
+//        return itemId >= 0 && itemId < getItemCount(); // Trả về true nếu itemId hợp lệ
+//    }
 }

@@ -17,6 +17,7 @@ import androidx.viewbinding.ViewBinding;
 import com.actvn.at170557.storefashion.R;
 import com.actvn.at170557.storefashion.baseapplication.BaseFragment;
 import com.actvn.at170557.storefashion.databinding.FragmentMyCartBinding;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -25,15 +26,18 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.EventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MyCartFragment extends BaseFragment {
+public class MyCartFragment extends BaseFragment implements CartAdapter.OnCartItemDeleteListener, CartAdapter.OnCartItemActionListener {
     private FragmentMyCartBinding binding;
     private FirebaseFirestore firestore;
     private List<CartItem> cartItems = new ArrayList<>();
     private CartAdapter cartAdapter;
     private String userId; // Biến lưu userId
+
+    private double totalAmount; // Biến lưu tổng số tiền
 
     @Override
     public int getLayoutFragment() {
@@ -63,12 +67,13 @@ public class MyCartFragment extends BaseFragment {
         // Cài đặt RecyclerView
         RecyclerView recyclerView = binding.recMycart;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        cartAdapter = new CartAdapter(getContext(), cartItems);
+        cartAdapter = new CartAdapter(getContext(), cartItems, this, this);
         recyclerView.setAdapter(cartAdapter);
 
         // Gọi phương thức để tải dữ liệu từ Firestore
         loadCartItems();
     }
+
     private void loadCartItems() {
         firestore.collection("Cart").document(userId).get()
                 .addOnCompleteListener(task -> {
@@ -134,4 +139,105 @@ public class MyCartFragment extends BaseFragment {
             // Xử lý checkout
         });
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+//        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        loadCartItems();
+    }
+
+    @Override
+    public void onCartItemDelete(int position, CartItem item) {
+        removeItemFromFirestore(item, position);
+    }
+
+    private void removeItemFromFirestore(CartItem item, int position) {
+        firestore.collection("Cart").document(userId).get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            List<Map<String, Object>> items = (List<Map<String, Object>>) document.get("items");
+                            if (items != null) {
+                                items.remove(position); // Remove item from the list
+                                // Update Firestore
+                                firestore.collection("Cart").document(userId)
+                                        .update("items", items)
+                                        .addOnSuccessListener(aVoid -> {
+                                            // Update the RecyclerView after successful deletion
+                                            cartItems.remove(position);
+                                            cartAdapter.notifyItemRemoved(position);
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("MyCartFragment", "Error removing item: ", e);
+                                        });
+                            }
+                        }
+                    }
+                });
+    }
+
+    //    @Override
+//    public void onAddQuantity(CartItem cartItem, int position) {
+//
+//    }
+//
+//    @Override
+//    public void onRemoveQuantity(CartItem cartItem, int position) {
+//
+//    }
+    @Override
+    public void onAddQuantity(CartItem cartItem, int position) {
+        int newQuantity = Integer.parseInt(cartItem.getQuantity()) + 1;
+        cartItem.setQuantity(String.valueOf(newQuantity));
+
+        // Cập nhật lại toàn bộ thông tin cho item trong danh sách giỏ hàng
+        updateCartItemInFirebase(cartItem); // Gọi một phương thức để cập nhật riêng cho item này
+
+        // Refresh the RecyclerView item
+        cartAdapter.notifyItemChanged(position);
+    }
+
+    @Override
+    public void onRemoveQuantity(CartItem cartItem, int position) {
+        int currentQuantity = Integer.parseInt(cartItem.getQuantity());
+        if (currentQuantity > 1) {
+            cartItem.setQuantity(String.valueOf(currentQuantity - 1));
+
+            // Cập nhật lại toàn bộ thông tin cho item trong danh sách giỏ hàng
+            updateCartItemInFirebase(cartItem); // Gọi một phương thức để cập nhật riêng cho item này
+
+            // Refresh the RecyclerView item
+            cartAdapter.notifyItemChanged(position);
+        }
+    }
+
+    // Phương thức cập nhật từng item trong giỏ hàng lên Firestore
+    private void updateCartItemInFirebase(CartItem cartItem) {
+        List<Map<String, Object>> updatedCartItems = new ArrayList<>();
+
+        for (CartItem item : cartItems) {
+            Map<String, Object> cartItemData = new HashMap<>();
+            cartItemData.put("productId", item.getProductId()); // Đảm bảo giữ lại productId
+            cartItemData.put("name", item.getName());
+            cartItemData.put("size", item.getSize());
+            cartItemData.put("price", item.getPrice());
+            cartItemData.put("quantity", Integer.parseInt(item.getQuantity())); // Cần đảm bảo quantity là số
+            cartItemData.put("imageUrl", item.getImageUrl());
+
+            updatedCartItems.add(cartItemData);
+        }
+
+        firestore.collection("Cart").document(userId)
+                .update("items", updatedCartItems)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("MyCartFragment", "Cart updated successfully");
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("MyCartFragment", "Error updating cart: ", e);
+                });
+    }
+
+
 }
