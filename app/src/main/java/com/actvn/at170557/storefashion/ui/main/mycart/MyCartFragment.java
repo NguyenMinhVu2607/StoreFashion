@@ -26,7 +26,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.EventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -192,45 +191,32 @@ public class MyCartFragment extends BaseFragment implements CartAdapter.OnCartIt
         int newQuantity = Integer.parseInt(cartItem.getQuantity()) + 1;
         cartItem.setQuantity(String.valueOf(newQuantity));
 
-        // Cập nhật lại toàn bộ thông tin cho item trong danh sách giỏ hàng
-        updateCartItemInFirebase(cartItem); // Gọi một phương thức để cập nhật riêng cho item này
+        // Update in Firestore
+        updateCartInFirebase();
 
         // Refresh the RecyclerView item
         cartAdapter.notifyItemChanged(position);
     }
 
+    // Implement onRemoveQuantity (for reducing a product quantity)
     @Override
     public void onRemoveQuantity(CartItem cartItem, int position) {
         int currentQuantity = Integer.parseInt(cartItem.getQuantity());
         if (currentQuantity > 1) {
             cartItem.setQuantity(String.valueOf(currentQuantity - 1));
 
-            // Cập nhật lại toàn bộ thông tin cho item trong danh sách giỏ hàng
-            updateCartItemInFirebase(cartItem); // Gọi một phương thức để cập nhật riêng cho item này
+            // Update in Firestore
+            updateCartInFirebase();
 
             // Refresh the RecyclerView item
             cartAdapter.notifyItemChanged(position);
         }
     }
 
-    // Phương thức cập nhật từng item trong giỏ hàng lên Firestore
-    private void updateCartItemInFirebase(CartItem cartItem) {
-        List<Map<String, Object>> updatedCartItems = new ArrayList<>();
-
-        for (CartItem item : cartItems) {
-            Map<String, Object> cartItemData = new HashMap<>();
-            cartItemData.put("productId", item.getProductId()); // Đảm bảo giữ lại productId
-            cartItemData.put("name", item.getName());
-            cartItemData.put("size", item.getSize());
-            cartItemData.put("price", item.getPrice());
-            cartItemData.put("quantity", Integer.parseInt(item.getQuantity())); // Cần đảm bảo quantity là số
-            cartItemData.put("imageUrl", item.getImageUrl());
-
-            updatedCartItems.add(cartItemData);
-        }
-
+    // Update the cart in Firebase after quantity change
+    private void updateCartInFirebase() {
         firestore.collection("Cart").document(userId)
-                .update("items", updatedCartItems)
+                .update("items", cartItems)
                 .addOnSuccessListener(aVoid -> {
                     Log.d("MyCartFragment", "Cart updated successfully");
                 })
@@ -238,6 +224,4 @@ public class MyCartFragment extends BaseFragment implements CartAdapter.OnCartIt
                     Log.e("MyCartFragment", "Error updating cart: ", e);
                 });
     }
-
-
 }

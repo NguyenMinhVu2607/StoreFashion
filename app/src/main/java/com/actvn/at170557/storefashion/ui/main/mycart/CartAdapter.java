@@ -65,7 +65,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         });
         holder.cart_item_size.setText("Size: "+item.getSize());
         holder.titleTextView.setText(item.getName());
-        holder.priceTextView.setText(item.getPrice());
+        holder.priceTextView.setText(""+item.getPrice());
         holder.quantityTextView.setText(item.getQuantity());
         holder.removeCityButton.setOnClickListener(v -> {
             // Notify fragment about the delete action
