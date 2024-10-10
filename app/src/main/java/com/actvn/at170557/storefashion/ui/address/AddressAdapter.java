@@ -13,13 +13,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.actvn.at170557.storefashion.R;
 
 import java.util.List;
-
 public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressViewHolder> {
 
-    private List<String> addressList;
+    private List<Address> addressList;
     private int selectedPosition = -1;
 
-    public AddressAdapter(List<String> addressList) {
+    public AddressAdapter(List<Address> addressList) {
         this.addressList = addressList;
     }
 
@@ -33,8 +32,8 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressV
 
     @Override
     public void onBindViewHolder(@NonNull AddressViewHolder holder, int position) {
-        String address = addressList.get(position);
-        holder.tvTitleAddress.setText(address);
+        Address address = addressList.get(position);
+        holder.tvTitleAddress.setText(address.getCity());
 
         // Set background drawable resource based on selection
         if (position == selectedPosition) {
@@ -66,3 +65,5 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressV
         }
     }
 }
+
+

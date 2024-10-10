@@ -1,6 +1,8 @@
 package com.actvn.at170557.storefashion.ui.main.mycart;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,26 +19,23 @@ import androidx.viewbinding.ViewBinding;
 import com.actvn.at170557.storefashion.R;
 import com.actvn.at170557.storefashion.baseapplication.BaseFragment;
 import com.actvn.at170557.storefashion.databinding.FragmentMyCartBinding;
-import com.google.firebase.auth.FirebaseAuth;
+import com.actvn.at170557.storefashion.ui.main.OnCartItemActionListener;
+import com.actvn.at170557.storefashion.ui.main.OnCartItemDeleteListener;
+import com.actvn.at170557.storefashion.ui.pay.CheckoutActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.EventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MyCartFragment extends BaseFragment implements CartAdapter.OnCartItemDeleteListener, CartAdapter.OnCartItemActionListener {
+public class MyCartFragment extends BaseFragment implements OnCartItemDeleteListener, OnCartItemActionListener {
     private FragmentMyCartBinding binding;
     private FirebaseFirestore firestore;
     private List<CartItem> cartItems = new ArrayList<>();
     private CartAdapter cartAdapter;
-    private String userId; // Biến lưu userId
-
-    private double totalAmount; // Biến lưu tổng số tiền
+    private String userId;
 
     @Override
     public int getLayoutFragment() {
@@ -49,30 +48,45 @@ public class MyCartFragment extends BaseFragment implements CartAdapter.OnCartIt
         return binding;
     }
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             userId = getArguments().getString("USER_ID");
         }
-        firestore = FirebaseFirestore.getInstance(); // Khởi tạo Firestore
+        firestore = FirebaseFirestore.getInstance();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Cài đặt RecyclerView
+        // Setup RecyclerView
         RecyclerView recyclerView = binding.recMycart;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         cartAdapter = new CartAdapter(getContext(), cartItems, this, this);
         recyclerView.setAdapter(cartAdapter);
 
-        // Gọi phương thức để tải dữ liệu từ Firestore
+        // Load cart items from Firestore
         loadCartItems();
+
+        binding.gotoCheckout.setOnClickListener(v -> {
+            List<CartItem> selectedItems = getSelectedItems(); // Lấy danh sách sản phẩm đã chọn
+            Intent intent = new Intent(getContext(), CheckoutActivity.class);
+            intent.putParcelableArrayListExtra("SELECTED_ITEMS", new ArrayList<>(selectedItems)); // Gửi danh sách sản phẩm
+            startActivity(intent);
+        });
     }
 
+    private List<CartItem> getSelectedItems() {
+        List<CartItem> selectedItems = new ArrayList<>();
+        for (CartItem item : cartItems) {
+            if (item.isChecked()) {
+                selectedItems.add(item);
+            }
+        }
+        return selectedItems;
+    }
     private void loadCartItems() {
         firestore.collection("Cart").document(userId).get()
                 .addOnCompleteListener(task -> {
@@ -81,11 +95,9 @@ public class MyCartFragment extends BaseFragment implements CartAdapter.OnCartIt
                         if (document.exists()) {
                             List<Map<String, Object>> items = (List<Map<String, Object>>) document.get("items");
                             if (items != null) {
-                                cartItems.clear(); // Xóa các mục cũ
-                                double totalAmount = 0; // Khởi tạo biến tổng
+                                cartItems.clear();
 
                                 for (Map<String, Object> itemMap : items) {
-                                    // Chuyển đổi Map thành CartItem
                                     CartItem cartItem = new CartItem(
                                             (String) itemMap.get("imageUrl"),
                                             (String) itemMap.get("name"),
@@ -93,17 +105,11 @@ public class MyCartFragment extends BaseFragment implements CartAdapter.OnCartIt
                                             String.valueOf(itemMap.get("price")),
                                             String.valueOf(itemMap.get("quantity"))
                                     );
-                                    cartItems.add(cartItem); // Thêm vào danh sách
-
-                                    // Cộng dồn số tiền cho từng sản phẩm
-                                    double price = Double.parseDouble(String.valueOf(itemMap.get("price"))); // Lấy giá sản phẩm
-                                    int quantity = Integer.parseInt(String.valueOf(itemMap.get("quantity"))); // Lấy số lượng
-                                    totalAmount += price * quantity; // Cộng dồn vào tổng
+                                    cartItems.add(cartItem);
                                 }
 
-                                // Cập nhật giao diện
-                                updateTotalAmount(totalAmount);
-                                cartAdapter.notifyDataSetChanged(); // Cập nhật Adapter
+//                                updateTotalAmount(cartItems); // Cập nhật tổng số tiền
+                                cartAdapter.notifyDataSetChanged();
                             }
                         } else {
                             Log.d("MyCartFragment", "Document does not exist");
@@ -114,37 +120,37 @@ public class MyCartFragment extends BaseFragment implements CartAdapter.OnCartIt
                 });
     }
 
-    private void updateTotalAmount(double totalAmount) {
-        // Giả sử bạn đã có biến cho các TextView của tổng số tiền
-        TextView tvTotalAmount = getView().findViewById(R.id.tv_total_amount);
-        TextView tvGrandTotal = getView().findViewById(R.id.tv_grand_total);
-        TextView shippingFee = getView().findViewById(R.id.shipping_fee);
+    private void updateTotalAmount(List<CartItem> items) {
+        double totalAmount = calculateTotalAmount(getSelectedItems()); // Tính toán tổng chỉ cho các item được chọn
+        TextView tvTotalAmount = binding.tvTotalAmount;
+        TextView tvGrandTotal = binding.tvGrandTotal;
+        TextView shippingFee = binding.shippingFee;
 
-        // Giả sử phí vận chuyển là miễn phí
         String shippingCost = "Free";
-        double grandTotal = totalAmount; // Cập nhật grandTotal
+        double grandTotal = totalAmount;
 
-        // Cập nhật giá trị vào TextView
-        tvTotalAmount.setText("$" + totalAmount); // Cập nhật tổng tiền
-        tvGrandTotal.setText("$" + grandTotal); // Cập nhật tổng tiền
-        shippingFee.setText(shippingCost); // Cập nhật phí vận chuyển
+        tvTotalAmount.setText("$" + totalAmount);
+        tvGrandTotal.setText("$" + grandTotal);
+        shippingFee.setText(shippingCost);
+    }
+
+    private double calculateTotalAmount(List<CartItem> selectedItems) {
+        double total = 0;
+        for (CartItem item : selectedItems) {
+            if (item.isChecked()) { // Chỉ tính cho các item được chọn
+                double price = Double.parseDouble(item.getPrice());
+                int quantity = Integer.parseInt(item.getQuantity());
+                // Đảm bảo quantity không phải là "000"
+                if (quantity > 0) {
+                    total += price * quantity;
+                }
+            }
+        }
+        return total;
     }
 
 
-    @Override
-    public void onClickViews() {
-        super.onClickViews();
-        binding.gotoCheckout.setOnClickListener(v -> {
-            // Xử lý checkout
-        });
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-//        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        loadCartItems();
-    }
 
     @Override
     public void onCartItemDelete(int position, CartItem item) {
@@ -159,14 +165,13 @@ public class MyCartFragment extends BaseFragment implements CartAdapter.OnCartIt
                         if (document.exists()) {
                             List<Map<String, Object>> items = (List<Map<String, Object>>) document.get("items");
                             if (items != null) {
-                                items.remove(position); // Remove item from the list
-                                // Update Firestore
+                                items.remove(position);
                                 firestore.collection("Cart").document(userId)
                                         .update("items", items)
                                         .addOnSuccessListener(aVoid -> {
-                                            // Update the RecyclerView after successful deletion
                                             cartItems.remove(position);
                                             cartAdapter.notifyItemRemoved(position);
+                                            updateTotalAmount(cartItems); // Cập nhật tổng số tiền
                                         })
                                         .addOnFailureListener(e -> {
                                             Log.e("MyCartFragment", "Error removing item: ", e);
@@ -177,51 +182,64 @@ public class MyCartFragment extends BaseFragment implements CartAdapter.OnCartIt
                 });
     }
 
-    //    @Override
-//    public void onAddQuantity(CartItem cartItem, int position) {
-//
-//    }
-//
-//    @Override
-//    public void onRemoveQuantity(CartItem cartItem, int position) {
-//
-//    }
     @Override
     public void onAddQuantity(CartItem cartItem, int position) {
         int newQuantity = Integer.parseInt(cartItem.getQuantity()) + 1;
         cartItem.setQuantity(String.valueOf(newQuantity));
-
-        // Update in Firestore
         updateCartInFirebase();
-
-        // Refresh the RecyclerView item
         cartAdapter.notifyItemChanged(position);
     }
 
-    // Implement onRemoveQuantity (for reducing a product quantity)
     @Override
     public void onRemoveQuantity(CartItem cartItem, int position) {
         int currentQuantity = Integer.parseInt(cartItem.getQuantity());
         if (currentQuantity > 1) {
             cartItem.setQuantity(String.valueOf(currentQuantity - 1));
-
-            // Update in Firestore
             updateCartInFirebase();
-
-            // Refresh the RecyclerView item
             cartAdapter.notifyItemChanged(position);
         }
     }
 
-    // Update the cart in Firebase after quantity change
+
+    @Override
+    public void onItemSelected(List<CartItem> selectedItems) {
+
+    }
+
+    @Override
+    public void onTotalAmountUpdated() {
+        updateTotalAmount(cartItems); // Cập nhật tổng số tiền chỉ cho các item được chọn
+
+    }
+
     private void updateCartInFirebase() {
+        // Chuẩn bị danh sách các bản đồ để cập nhật Firestore
+        List<Map<String, Object>> itemsToUpdate = new ArrayList<>();
+        for (CartItem cartItem : cartItems) {
+            Map<String, Object> itemMap = new HashMap<>(); // Sử dụng HashMap để tương thích
+            itemMap.put("imageUrl", cartItem.getImageUrl());
+            itemMap.put("name", cartItem.getName());
+            itemMap.put("size", cartItem.getSize());
+            itemMap.put("price", cartItem.getPrice());
+            itemMap.put("quantity", cartItem.getQuantity());
+            itemsToUpdate.add(itemMap);
+        }
+
+        // Cập nhật các mặt hàng trong Firestore
         firestore.collection("Cart").document(userId)
-                .update("items", cartItems)
+                .update("items", itemsToUpdate)
                 .addOnSuccessListener(aVoid -> {
-                    Log.d("MyCartFragment", "Cart updated successfully");
+                    Log.d("MyCartFragment", "Giỏ hàng đã được cập nhật thành công");
+                    updateTotalAmount(cartItems); // Cập nhật tổng số tiền sau khi cập nhật
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("MyCartFragment", "Error updating cart: ", e);
+                    Log.e("MyCartFragment", "Lỗi khi cập nhật giỏ hàng: ", e);
                 });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadCartItems();
     }
 }

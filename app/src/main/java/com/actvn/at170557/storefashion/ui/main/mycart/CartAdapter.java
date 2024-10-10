@@ -6,14 +6,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.actvn.at170557.storefashion.R;
+import com.actvn.at170557.storefashion.ui.main.OnCartItemActionListener;
+import com.actvn.at170557.storefashion.ui.main.OnCartItemDeleteListener;
 import com.actvn.at170557.storefashion.utils.FirebaseStorageHelper;
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // CartAdapter class for handling RecyclerView in MyCartsActivity
@@ -22,21 +28,14 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     private Context context;
     private List<CartItem> cartItemList;
     private OnCartItemDeleteListener deleteListener;
-    private OnCartItemActionListener actionlistener;
+    private OnCartItemActionListener actionListener;
+    private List<CartItem> selectedItems = new ArrayList<>(); // List to store selected items
 
-    // Interface to communicate actions to the Fragment
-    public interface OnCartItemActionListener {
-        void onAddQuantity(CartItem cartItem, int position);
-        void onRemoveQuantity(CartItem cartItem, int position);
-    }
-    public interface OnCartItemDeleteListener {
-        void onCartItemDelete(int position, CartItem item);
-    }
-    public CartAdapter(Context context, List<CartItem> cartItemList, OnCartItemDeleteListener deleteListener ,OnCartItemActionListener actionlistener ) {
+    public CartAdapter(Context context, List<CartItem> cartItemList, OnCartItemDeleteListener deleteListener, OnCartItemActionListener actionListener) {
         this.context = context;
         this.cartItemList = cartItemList;
         this.deleteListener = deleteListener;
-        this.actionlistener = actionlistener;
+        this.actionListener = actionListener;
     }
 
     @NonNull
@@ -46,38 +45,57 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         return new CartViewHolder(view);
     }
 
+    @Override
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
         CartItem item = cartItemList.get(position);
-        // Tải ảnh từ URL
-        FirebaseStorageHelper.getImageUri(item.getImageUrl(), new FirebaseStorageHelper.OnImageUriCallback() {
-            @Override
-            public void onImageUriReceived(Uri uri) {
-                if (uri != null) {
-                    String imageUrl = uri.toString();
-                    Log.d("imageUrl", "imageUrl:: " + imageUrl);
-                    Glide.with(context)
-                            .load(imageUrl)
-                            .placeholder(R.drawable.bg_load)
-                            .error(R.mipmap.ic_launcher)
-                            .into(holder.imageView);
-                }
+
+        // Load image using FirebaseStorageHelper and Glide
+        FirebaseStorageHelper.getImageUri(item.getImageUrl(), uri -> {
+            if (uri != null) {
+                Glide.with(context)
+                        .load(uri.toString())
+                        .placeholder(R.drawable.bg_load)
+                        .error(R.mipmap.ic_launcher)
+                        .into(holder.imageView);
             }
         });
-        holder.cart_item_size.setText("Size: "+item.getSize());
+
+        // Set other item details
         holder.titleTextView.setText(item.getName());
-        holder.priceTextView.setText(""+item.getPrice());
+        holder.priceTextView.setText("$" + item.getPrice());
         holder.quantityTextView.setText(item.getQuantity());
-        holder.removeCityButton.setOnClickListener(v -> {
-            // Notify fragment about the delete action
-            deleteListener.onCartItemDelete(position, item);
-        });
-        holder.add_a_product.setOnClickListener(v -> {
-            actionlistener.onAddQuantity(item, position); // Notify Fragment when clicked
+        holder.cart_item_size.setText("Size: " + item.getSize());
+
+        // Set checkbox state based on selectedItems list
+        holder.checkBox.setChecked(selectedItems.contains(item));
+
+        // Handle checkbox selection/deselection
+        // Thiết lập checkbox
+        holder.checkBox.setChecked(item.isChecked());
+
+        holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            item.setChecked(isChecked); // Cập nhật trạng thái isChecked
+            actionListener.onItemSelected(selectedItems); // Cập nhật listener với các item được chọn
+            actionListener.onTotalAmountUpdated(); // Gọi phương thức để tính toán lại tổng số tiền
         });
 
-        // Handle Minus button
+
+
+        // Handle other buttons for quantity increment/decrement
+        holder.add_a_product.setOnClickListener(v -> actionListener.onAddQuantity(item, position));
+        holder.minus_a_product.setOnClickListener(v -> actionListener.onRemoveQuantity(item, position));
+        holder.removeCityButton.setOnClickListener(v -> deleteListener.onCartItemDelete(position, item));
+
+        holder.removeCityButton.setOnClickListener(v -> {
+            deleteListener.onCartItemDelete(position, item);
+        });
+
+        holder.add_a_product.setOnClickListener(v -> {
+            actionListener.onAddQuantity(item, position);
+        });
+
         holder.minus_a_product.setOnClickListener(v -> {
-            actionlistener.onRemoveQuantity(item, position); // Notify Fragment when clicked
+            actionListener.onRemoveQuantity(item, position);
         });
     }
 
@@ -86,10 +104,15 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         return cartItemList.size();
     }
 
+    public List<CartItem> getSelectedItems() {
+        return selectedItems; // Method to get selected items
+    }
+
     public static class CartViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageView,add_a_product,minus_a_product;
+        ImageView imageView, add_a_product, minus_a_product;
         ImageView removeCityButton;
-        TextView titleTextView, priceTextView, quantityTextView,cart_item_size;
+        TextView titleTextView, priceTextView, quantityTextView, cart_item_size;
+        CheckBox checkBox;
 
         public CartViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -101,6 +124,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             titleTextView = itemView.findViewById(R.id.cart_item_title);
             priceTextView = itemView.findViewById(R.id.cart_item_price);
             quantityTextView = itemView.findViewById(R.id.cart_item_quantity);
+            checkBox = itemView.findViewById(R.id.checkbox_select_item); // Initialize CheckBox
         }
     }
 }

@@ -45,6 +45,18 @@
                 android:background="@color/white"
                 android:padding="12dp">
 
+                <CheckBox
+                    android:id="@+id/checkbox_select_item"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:padding="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardLocation"
                     android:layout_width="70dp"
@@ -52,6 +64,10 @@
                     app:cardBackgroundColor="@color/transparent"
                     app:cardCornerRadius="10dp"
                     app:cardElevation="0dp"
+                    android:layout_marginStart="3dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/checkbox_select_item"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:strokeWidth="0dp">
 
                     <ImageView
