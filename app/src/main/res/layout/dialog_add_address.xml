@@ -4,6 +4,13 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
+    <EditText
+        android:id="@+id/edtAddressName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+
+        android:hint="Tên Địa Chỉ" />
 
     <EditText
         android:id="@+id/edtStreet"

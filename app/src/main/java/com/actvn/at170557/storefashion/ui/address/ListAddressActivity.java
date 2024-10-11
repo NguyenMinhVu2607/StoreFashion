@@ -46,6 +46,7 @@ public class ListAddressActivity extends AppCompatActivity {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_address, null);
         builder.setView(dialogView);
 
+        EditText edtAddressName = dialogView.findViewById(R.id.edtAddressName);
         EditText edtStreet = dialogView.findViewById(R.id.edtStreet);
         EditText edtWard = dialogView.findViewById(R.id.edtWard);
         EditText edtDistrict = dialogView.findViewById(R.id.edtDistrict);
@@ -53,11 +54,12 @@ public class ListAddressActivity extends AppCompatActivity {
 
         builder.setTitle("Thêm Địa Chỉ")
                 .setPositiveButton("Lưu", (dialog, which) -> {
+                    String addressName = edtAddressName.getText().toString();
                     String street = edtStreet.getText().toString();
                     String ward = edtWard.getText().toString();
                     String district = edtDistrict.getText().toString();
                     String city = edtCity.getText().toString();
-                    saveAddressToFirestore(street, ward, district, city);
+                    saveAddressToFirestore(addressName, street, ward, district, city);
                 })
                 .setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
 
@@ -65,11 +67,12 @@ public class ListAddressActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void saveAddressToFirestore(String street, String ward, String district, String city) {
+
+    private void saveAddressToFirestore(String addressName, String street, String ward, String district, String city) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Tạo một đối tượng địa chỉ
-        Address address = new Address(street, ward, district, city);
+        Address address = new Address(addressName, street, ward, district, city);
 
         // Tạo ID ngẫu nhiên cho địa chỉ
         String addressId = db.collection("UserAddresses").document(userId).collection("Addresses").document().getId();
@@ -89,6 +92,7 @@ public class ListAddressActivity extends AppCompatActivity {
                     Toast.makeText(this, "Lưu địa chỉ thất bại", Toast.LENGTH_SHORT).show();
                 });
     }
+
 
 
 

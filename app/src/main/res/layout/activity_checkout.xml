@@ -54,8 +54,9 @@
         android:id="@+id/layout_address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:paddingHorizontal="16dp"
+        android:onClick="showAddressDialog"
         app:layout_constraintTop_toBottomOf="@+id/textView_edit_address"
         tools:layout_editor_absoluteX="0dp">
 
@@ -70,7 +71,7 @@
 
         <TextView
 
-            android:id="@+id/textView12"
+            android:id="@+id/tvAddress_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
@@ -82,6 +83,7 @@
             app:layout_constraintStart_toEndOf="@+id/imageView3" />
 
         <TextView
+            android:id="@+id/tv_fullAddress"
 
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -92,8 +94,19 @@
             android:textSize="15dp"
             android:textStyle="normal"
             app:layout_constraintStart_toEndOf="@+id/imageView3"
-            app:layout_constraintTop_toBottomOf="@+id/textView12" />
+            app:layout_constraintTop_toBottomOf="@+id/tvAddress_name" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <EditText
+        android:id="@+id/tvPhoneNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Phone Number"
+        android:padding="12dp"
+        android:layout_margin="12dp"
+        android:background="@drawable/button_background"
+        android:backgroundTint="@color/transparent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_address" />
     <View
         android:id="@+id/view11"
         android:layout_width="match_parent"
@@ -101,7 +114,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="12dp"
         android:background="@color/color_neutral05"
-        app:layout_constraintTop_toBottomOf="@+id/layout_address" />
+        app:layout_constraintTop_toBottomOf="@+id/tvPhoneNumber" />
 
 
     <TextView
@@ -116,7 +129,7 @@
         android:textColor="@color/black"
         android:textSize="16dp"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@+id/layout_address"
+        app:layout_constraintTop_toBottomOf="@+id/tvPhoneNumber"
         tools:layout_editor_absoluteX="16dp" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -143,7 +156,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:text="Debit/Credit Card"
+            android:text="Payment Type "
 
             android:textColor="@color/black"
             android:textSize="16dp"

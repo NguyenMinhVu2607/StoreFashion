@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -16,12 +17,14 @@
         android:theme="@style/Theme.StoreFashion"
         tools:targetApi="31">
         <activity
+            android:name=".ui.order.orderPreview.OrderPreviewActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.address.ListAddressActivity"
             android:exported="false" />
         <activity
             android:name=".ui.pay.CheckoutActivity"
             android:exported="false" />
-
         <activity
             android:name=".ui.detailproduct.DetailProductActivity"
             android:exported="true" />
@@ -59,26 +62,27 @@
         <activity
             android:name=".ui.splash.SplashActivity"
             android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-             <intent-filter>
-             <action android:name="android.intent.action.MAIN" />
-
-
-             <category android:name="android.intent.category.LAUNCHER" />
-             </intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="true">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
 
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyB0B1kH8NU6EZ9kPD3VMmj3ah5JgCXnl7s"/>
+            android:value="AIzaSyB0B1kH8NU6EZ9kPD3VMmj3ah5JgCXnl7s" />
     </application>
 
 </manifest>

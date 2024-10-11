@@ -33,7 +33,8 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressV
     @Override
     public void onBindViewHolder(@NonNull AddressViewHolder holder, int position) {
         Address address = addressList.get(position);
-        holder.tvTitleAddress.setText(address.getCity());
+        holder.tvTitleAddress.setText(address.getAddressName());
+        holder.tv_full_address.setText(address.getStreet()+", "+address.getWard() + ", "+address.getDistrict()+", "+address.getCity());
 
         // Set background drawable resource based on selection
         if (position == selectedPosition) {
@@ -55,12 +56,13 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.AddressV
     }
 
     public static class AddressViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTitleAddress;
+        TextView tvTitleAddress,tv_full_address;
         ConstraintLayout itemLayout;
 
         public AddressViewHolder(@NonNull View itemView) {
             super(itemView);
             tvTitleAddress = itemView.findViewById(R.id.tv_title_address);
+            tv_full_address = itemView.findViewById(R.id.tv_full_address);
             itemLayout = itemView.findViewById(R.id.item_layout);
         }
     }
