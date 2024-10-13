@@ -10,7 +10,9 @@ public class CartItem implements Parcelable {
     private String price;
     private String quantity;
     private boolean isChecked;
-
+    public CartItem() {
+        // Constructor mặc định
+    }
     // Constructor
     public CartItem(String imageUrl, String name, String size, String price, String quantity) {
         this.imageUrl = imageUrl;

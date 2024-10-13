@@ -50,7 +50,7 @@
         tools:layout_editor_absoluteX="16dp" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+        android:id="@+id/recyclerViewSelectedItems"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
@@ -68,27 +68,25 @@
         android:textColor="@color/black"
         android:textSize="16dp"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerView"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerViewSelectedItems"
         tools:layout_editor_absoluteX="16dp" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/materialCardView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="8dp"
         android:elevation="25dp"
         app:cardCornerRadius="12dp"
         app:layout_constraintTop_toBottomOf="@+id/textView5"
         app:strokeWidth="0dp"
         tools:layout_editor_absoluteX="16dp">
-
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
-            android:onClick="showAddressDialog"
             android:paddingHorizontal="16dp"
             android:paddingVertical="6dp"
             app:layout_constraintTop_toBottomOf="@+id/textView5"
@@ -97,7 +95,7 @@
 
             <TextView
 
-                android:id="@+id/tvAddress_name"
+                android:id="@+id/tvAddressName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
@@ -108,7 +106,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tv_fullAddress"
+                android:id="@+id/tvFullAddress"
 
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -118,7 +116,18 @@
                 android:textColor="@color/color_neutral02"
                 android:textSize="15dp"
                 android:textStyle="normal"
-                app:layout_constraintTop_toBottomOf="@+id/tvAddress_name" />
+                app:layout_constraintTop_toBottomOf="@+id/tvAddressName" />
+            <TextView
+                android:id="@+id/tvFullSDT"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:text="000000"
+
+                android:textColor="@color/color_neutral02"
+                android:textSize="15dp"
+                android:textStyle="normal"
+                app:layout_constraintTop_toBottomOf="@+id/tvFullAddress" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -136,23 +145,79 @@
         tools:layout_editor_absoluteX="16dp" />
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/materialCardView3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:elevation="25dp"
         app:cardCornerRadius="12dp"
         app:layout_constraintTop_toBottomOf="@+id/textView6"
-        app:strokeWidth="0dp">
+        app:strokeWidth="0dp"
+        tools:layout_editor_absoluteX="16dp">
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
-            android:onClick="showAddressDialog"
+
             android:paddingHorizontal="16dp"
             android:paddingVertical="6dp"
+            app:layout_constraintTop_toBottomOf="@+id/textView5"
+            tools:layout_editor_absoluteX="0dp">
+
+
+
+            <TextView
+
+                android:id="@+id/tvPaymentType"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+
+                android:text="Cash on Delivery"
+                android:textColor="@color/black"
+                android:textSize="16dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/imageView5"
+                app:layout_constraintTop_toTopOf="parent" />
+
+<!--            <TextView-->
+<!--                android:id="@+id/tvCardNumber"-->
+
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginHorizontal="16dp"-->
+<!--                android:text="3753275027590"-->
+
+<!--                android:textColor="@color/color_neutral02"-->
+<!--                android:textSize="15dp"-->
+<!--                android:textStyle="normal"-->
+<!--                app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                app:layout_constraintStart_toEndOf="@+id/imageView5"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/name_card" />-->
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/materialCardView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:elevation="25dp"
+        app:cardCornerRadius="12dp"
+        app:layout_constraintTop_toBottomOf="@+id/materialCardView3"
+        app:strokeWidth="0dp"
+        tools:layout_editor_absoluteX="16dp">
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="3dp"
             app:layout_constraintTop_toBottomOf="@+id/textView5"
             tools:layout_editor_absoluteX="0dp">
 
@@ -183,7 +248,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/card_number"
+                android:id="@+id/tvCardNumber"
 
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -237,7 +302,7 @@
                 android:id="@+id/tv_total_amount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="$730"
+                android:text="$0"
                 android:textColor="@color/colorPrimary"
                 android:textSize="16dp"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -295,7 +360,7 @@
 
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="$730"
+                android:text="$0"
                 android:textColor="@color/black"
                 android:textSize="18dp"
                 android:textStyle="bold"
@@ -303,7 +368,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
-            android:id="@+id/goto_checkout"
+            android:id="@+id/payy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"

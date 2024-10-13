@@ -17,6 +17,9 @@
         android:theme="@style/Theme.StoreFashion"
         tools:targetApi="31">
         <activity
+            android:name=".ui.order.OrderHistoryActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.order.orderPreview.OrderPreviewActivity"
             android:exported="false" />
         <activity

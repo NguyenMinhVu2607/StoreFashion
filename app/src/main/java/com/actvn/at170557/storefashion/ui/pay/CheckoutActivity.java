@@ -1,15 +1,21 @@
 package com.actvn.at170557.storefashion.ui.pay;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.LinearLayoutCompat;
 
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log; // Thêm import để sử dụng Log
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +24,7 @@ import com.actvn.at170557.storefashion.databinding.ActivityCheckoutBinding;
 import com.actvn.at170557.storefashion.ui.address.Address;
 import com.actvn.at170557.storefashion.ui.address.ListAddressActivity;
 import com.actvn.at170557.storefashion.ui.main.mycart.CartItem;
+import com.actvn.at170557.storefashion.ui.order.orderPreview.OrderPreviewActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -64,7 +71,113 @@ public class CheckoutActivity extends AppCompatActivity {
             // Trường hợp không có user đã đăng nhập
             Toast.makeText(this, "Không có người dùng nào đăng nhập", Toast.LENGTH_SHORT).show();
         }
+        binding.layoutPayment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu popup = new PopupMenu(CheckoutActivity.this, v);
+                popup.getMenuInflater().inflate(R.menu.payment_menu, popup.getMenu());
 
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        int itemId = item.getItemId();
+
+                        if (itemId == R.id.payment_card) {
+                            showCardPaymentLayout();
+                            binding.tvPaytype.setText("Payment by card");
+                            return true;
+                        } else if (itemId == R.id.payment_cod) {
+                            hideCardPaymentLayout();
+                            binding.tvPaytype.setText("Cash on delivery");
+
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+
+                });
+                popup.show();
+            }
+        });
+        binding.gotoPaynow.setOnClickListener(v -> proceedToOrderPreview());
+// TextWatcher cho thẻ tín dụng (Card Number)
+        binding.tvCardnumber.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int after) {
+                String cardNumber = charSequence.toString();
+                if (cardNumber.length() > 0) {
+                    // Loại bỏ khoảng trắng và chia thành các nhóm 4 ký tự
+                    String formattedCardNumber = cardNumber.replaceAll("\\s+", "").replaceAll("(.{4})(?!$)", "$1 ");
+
+                    // Kiểm tra nếu giá trị thay đổi trước khi cập nhật lại EditText
+                    if (!formattedCardNumber.equals(cardNumber)) {
+                        ((EditText) findViewById(R.id.tv_cardnumber)).setText(formattedCardNumber);
+                        ((EditText) findViewById(R.id.tv_cardnumber)).setSelection(formattedCardNumber.length()); // Đặt con trỏ vào cuối
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+
+// TextWatcher cho ngày hết hạn (Exp Date)
+        binding.tvExDate.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int after) {
+                String expDate = charSequence.toString();
+                if (expDate.length() == 2 && !expDate.contains("/")) {
+                    // Định dạng MM/YY
+                    String formattedExpDate = expDate.substring(0, 2) + "/" + expDate.substring(2);
+
+                    // Kiểm tra nếu giá trị thay đổi trước khi cập nhật lại EditText
+                    if (!formattedExpDate.equals(expDate)) {
+                        ((EditText) findViewById(R.id.tv_ex_date)).setText(formattedExpDate);
+                        ((EditText) findViewById(R.id.tv_ex_date)).setSelection(formattedExpDate.length());
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+
+// TextWatcher cho CVV
+        binding.tvCvv.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int after) {
+                String cvv = charSequence.toString();
+                if (cvv.length() > 3) {
+                    // Hạn chế CVV chỉ 3 chữ số (Visa, MasterCard) hoặc 4 chữ số (American Express)
+                    String formattedCvv = cvv.substring(0, 4);
+
+                    // Kiểm tra nếu giá trị thay đổi trước khi cập nhật lại EditText
+                    if (!formattedCvv.equals(cvv)) {
+                        ((EditText) findViewById(R.id.tv_cvv)).setText(formattedCvv);
+                        ((EditText) findViewById(R.id.tv_cvv)).setSelection(formattedCvv.length());
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
     }
 
     private void setupRecyclerView() {
@@ -88,7 +201,7 @@ public class CheckoutActivity extends AppCompatActivity {
                                 TextView tv_fullAddress = findViewById(R.id.tv_fullAddress);
 
                                 tvAddress_name.setText(address.getAddressName());
-                                tv_fullAddress.setText(address.getStreet()+", "+address.getWard() + ", "+address.getDistrict()+", "+address.getCity());
+                                tv_fullAddress.setText(address.getStreet() + ", " + address.getWard() + ", " + address.getDistrict() + ", " + address.getCity());
                             }
                         } else {
                             Toast.makeText(this, "Không có địa chỉ nào", Toast.LENGTH_SHORT).show();
@@ -98,6 +211,7 @@ public class CheckoutActivity extends AppCompatActivity {
                     }
                 });
     }
+
     public void showAddressDialog(View view) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -146,13 +260,72 @@ public class CheckoutActivity extends AppCompatActivity {
             TextView tv_fullAddress = findViewById(R.id.tv_fullAddress);
 
             tvStreet.setText(selectedAddress.getStreet());
-            tv_fullAddress.setText(selectedAddress.getStreet()+", "+selectedAddress.getWard() + ", "+selectedAddress.getDistrict()+", "+selectedAddress.getCity());
+            tv_fullAddress.setText(selectedAddress.getStreet() + ", " + selectedAddress.getWard() + ", " + selectedAddress.getDistrict() + ", " + selectedAddress.getCity());
 
             Toast.makeText(this, "Đã chọn địa chỉ: " + selectedAddress.getStreet(), Toast.LENGTH_SHORT).show();
         });
 
         // Hiển thị dialog
         builder.create().show();
+    }
+
+    private void proceedToOrderPreview() {
+        // Lấy địa chỉ
+        String addressName = ((TextView) findViewById(R.id.tvAddress_name)).getText().toString();
+        String fullAddress = ((TextView) findViewById(R.id.tv_fullAddress)).getText().toString();
+
+        // Lấy số điện thoại
+        String phoneNumber = ((EditText) findViewById(R.id.tvPhoneNumber)).getText().toString();
+
+        // Lấy thông tin thẻ (nếu thanh toán qua thẻ Visa)
+        String cardNumber = ((EditText) findViewById(R.id.tv_cardnumber)).getText().toString();
+        String expDate = ((EditText) findViewById(R.id.tv_ex_date)).getText().toString();
+        String cvv = ((EditText) findViewById(R.id.tv_cvv)).getText().toString();
+
+        // Lấy thông tin phương thức thanh toán
+        String paymentType = binding.tvPaytype.getText().toString();
+
+        // Kiểm tra thông tin đầy đủ
+        if (phoneNumber.isEmpty()) {
+            Toast.makeText(this, "Vui lòng nhập số điện thoại", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Chuyển qua màn hình OrderPreview
+        Intent intent = new Intent(CheckoutActivity.this, OrderPreviewActivity.class);
+        intent.putExtra("ADDRESS_NAME", addressName);
+        intent.putExtra("FULL_ADDRESS", fullAddress);
+        intent.putExtra("PHONE_NUMBER", phoneNumber);
+        intent.putExtra("PAYMENT_TYPE", paymentType);
+
+        if (paymentType.equals("Payment by card")) {
+            intent.putExtra("CARD_NUMBER", cardNumber);
+            intent.putExtra("EXP_DATE", expDate);
+            intent.putExtra("CVV", cvv);
+        }
+
+        // Truyền danh sách các sản phẩm đã chọn
+        ArrayList<CartItem> selectedItems = getIntent().getParcelableArrayListExtra("SELECTED_ITEMS");
+        intent.putParcelableArrayListExtra("SELECTED_ITEMS", selectedItems);
+
+        startActivity(intent);
+    }
+
+
+    private void showCardPaymentLayout() {
+        EditText cardNumber = findViewById(R.id.tv_cardnumber);
+        LinearLayoutCompat cardDetailsLayout = findViewById(R.id.linearLayoutCompat3);
+
+        cardNumber.setVisibility(View.VISIBLE);
+        cardDetailsLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void hideCardPaymentLayout() {
+        EditText cardNumber = findViewById(R.id.tv_cardnumber);
+        LinearLayoutCompat cardDetailsLayout = findViewById(R.id.linearLayoutCompat3);
+
+        cardNumber.setVisibility(View.GONE);
+        cardDetailsLayout.setVisibility(View.GONE);
     }
 
 

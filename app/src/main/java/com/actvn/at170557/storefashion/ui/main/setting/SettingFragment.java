@@ -28,6 +28,7 @@ import com.actvn.at170557.storefashion.databinding.FragmentSettingsBinding;
 import com.actvn.at170557.storefashion.ui.address.ListAddressActivity;
 import com.actvn.at170557.storefashion.ui.login_signup.LoginActivity;
 import com.actvn.at170557.storefashion.ui.main.mycart.MyCartFragment;
+import com.actvn.at170557.storefashion.ui.order.OrderHistoryActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -97,6 +98,13 @@ public class SettingFragment extends BaseFragment implements OnMapReadyCallback 
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), ListAddressActivity.class);
+                startActivity(intent);
+            }
+        });
+        binding.layoutOrderHis.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), OrderHistoryActivity.class);
                 startActivity(intent);
             }
         });
