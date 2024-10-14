@@ -55,7 +55,6 @@ public class FavouriteFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         context = getContext();
-        Toast.makeText(context, "12333333", Toast.LENGTH_SHORT).show();
         // Khởi tạo SharedViewModel từ Activity
 //        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 //        Log.d("FavouriteFragment", "ViewModel initialized");

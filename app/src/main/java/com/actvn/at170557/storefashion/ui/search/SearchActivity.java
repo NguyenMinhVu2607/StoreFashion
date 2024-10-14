@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -15,6 +16,8 @@ import android.widget.Toast;
 
 import com.actvn.at170557.storefashion.R;
 import com.actvn.at170557.storefashion.databinding.ActivitySearchBinding;
+import com.actvn.at170557.storefashion.ui.detailproduct.DetailProductActivity;
+import com.actvn.at170557.storefashion.ui.main.home.model.ProductItem;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -23,11 +26,11 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity implements ProductAdapter.OnItemClickListener{
     private ActivitySearchBinding binding;
     private RecyclerView recyclerView;
     private ProductAdapter productAdapter;
-    private List<Product> productList = new ArrayList<>(); // Danh sách sản phẩm
+    private List<Product> productList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,12 +41,11 @@ public class SearchActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerViewResults);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        productAdapter = new ProductAdapter(productList);
+        productAdapter = new ProductAdapter(this,productList,this);
         recyclerView.setAdapter(productAdapter);
 
         binding.imgBack.setOnClickListener(v -> finish());
 
-        // Tạo TextWatcher cho ô tìm kiếm
         binding.editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -59,46 +61,42 @@ public class SearchActivity extends AppCompatActivity {
                     productAdapter.notifyDataSetChanged();
                 }
             }
-
             @Override
             public void afterTextChanged(Editable editable) {
             }
         });
     }
-
-    // Hàm tìm kiếm từ Firebase Firestore
     private void searchProducts(String query) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        Log.d("SearchActivity", "Searching for products with query: " + query); // Log the query being searched
-
-        // Tạo truy vấn tìm kiếm sản phẩm theo tên hoặc thương hiệu
         db.collection("Products")
-                .orderBy("name") // Sắp xếp theo tên sản phẩm
+                .orderBy("name")
                 .startAt(query)
-                .endAt(query + "\uf8ff") // Tìm kiếm theo tên bắt đầu từ query
+                .endAt(query + "\uf8ff")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    Log.d("SearchActivity", "Query successful. Found " + queryDocumentSnapshots.size() + " products."); // Log how many products are found
-                    productList.clear(); // Xóa danh sách cũ
+                    productList.clear();
                     for (QueryDocumentSnapshot snapshot : queryDocumentSnapshots) {
                         Product product = snapshot.toObject(Product.class);
-                        Log.d("SearchActivity", "Found product: " + product.getName()); // Log product name
+                        product.setId(snapshot.getId());
                         productList.add(product);
                     }
-                    productAdapter.notifyDataSetChanged(); // Cập nhật lại adapter với sản phẩm tìm được
+                    productAdapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("SearchActivity", "Error fetching products: " + e.getMessage()); // Log error if any
-                    Toast.makeText(SearchActivity.this, "Error fetching products", Toast.LENGTH_SHORT).show();
                 });
     }
 
-
-
-    // Ẩn thanh điều hướng
     protected void hideNavigationBar() {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+    }
+
+
+    @Override
+    public void onItemClick(Product item) {
+        Intent intent = new Intent(getApplicationContext(), DetailProductActivity.class);
+        intent.putExtra("PRODUCT_ID", item.getId());
+        startActivity(intent);
     }
 }

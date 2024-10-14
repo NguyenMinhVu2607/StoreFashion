@@ -25,7 +25,7 @@
         android:layout_margin="50dp"
         android:background="@color/colorBG"
         android:scaleType="centerInside"
-        android:src="@drawable/ob1"
+        android:src="@drawable/ob2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

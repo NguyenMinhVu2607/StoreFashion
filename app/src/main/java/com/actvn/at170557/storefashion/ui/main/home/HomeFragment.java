@@ -26,7 +26,10 @@ import com.actvn.at170557.storefashion.ui.main.listproducts.ListProductsActivity
 import com.actvn.at170557.storefashion.ui.search.SearchActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -35,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomeFragment extends BaseFragment {
-    private FragmentHomeBinding binding; // Use the generated binding class
+    private FragmentHomeBinding binding;
     private Context context;
     FirebaseFirestore db;
 
@@ -51,45 +54,43 @@ public class HomeFragment extends BaseFragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getUserNameFromFirestore(new FirestoreCallback() {
+            @Override
+            public void onCallback(String userName) {
+                binding.textViewWelcome.setText("Welcome " + userName + " to the app");
+            }
+        });
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         context = getContext();
         db = FirebaseFirestore.getInstance();
-
-        // Initialize RecyclerView using ViewBinding
         RecyclerView recyclerView = binding.recPopular;
         recyclerView.setLayoutManager(new GridLayoutManager(context, 2)); // 2 columns
-
-        // Load products and set adapter
         loadProductsFromFirestore();
     }
 
     private void loadProductsFromFirestore() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference productsRef = db.collection("Products");
-
-        // Hiện ProgressBar
-//        binding.progressBar.setVisibility(View.VISIBLE);
-
         productsRef.get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        // Ẩn ProgressBar
                         binding.progress.setVisibility(View.GONE);
                         binding.recPopular.setVisibility(View.VISIBLE);
-
                         if (task.isSuccessful()) {
                             List<ProductItem> itemList = new ArrayList<>();
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 ProductItem product = document.toObject(ProductItem.class);
                                 product.setId(document.getId());
-
-                                // Tạo đường dẫn hình ảnh
                                 String itemId = document.getId();
-                                String imagePath = "/img_product/" + itemId + ".jpg"; // Đường dẫn hình ảnh
-                                product.setLinkImg(imagePath); // Thiết lập linkImg
-
+                                String imagePath = "/img_product/" + itemId + ".jpg";
+                                product.setLinkImg(imagePath);
                                 itemList.add(product);
 
                                 // Log thông tin
@@ -98,13 +99,10 @@ public class HomeFragment extends BaseFragment {
                                 Log.d("ProductItem", "Name: " + product.getName());
                                 Log.d("ProductItem", "Price: " + product.getPrice());
                                 Log.d("ProductItem", "Sizes: " + (product.getSize() != null ? product.getSize().toString() : "No sizes available"));
-                                Log.d("ProductItem", "Image Link: " + product.getLinkImg()); // Log đường dẫn hình ảnh
+                                Log.d("ProductItem", "Image Link: " + product.getLinkImg());
                             }
-
-                            // Kiểm tra danh sách có rỗng không
                             if (itemList.isEmpty()) {
                                 Log.d("ProductItem", "No products available.");
-                                // Hiện thông báo rằng không có sản phẩm
                             } else {
                                 PopularAdapter popularAdapter = new PopularAdapter(context, itemList, item -> {
                                     Intent intent = new Intent(context, DetailProductActivity.class);
@@ -115,14 +113,45 @@ public class HomeFragment extends BaseFragment {
                             }
                         } else {
                             Log.d("ProductItem", "Error getting documents: ", task.getException());
-                            // Hiện thông báo lỗi cho người dùng
                         }
                     }
                 });
     }
 
+    public void getUserNameFromFirestore(FirestoreCallback callback) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("Users").document(userId).get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()) {
+                                    String userName = document.getString("userName");
 
-
+                                    if (userName != null && !userName.isEmpty()) {
+                                        callback.onCallback(userName);
+                                    } else {
+                                        callback.onCallback("User");
+                                    }
+                                } else {
+                                    callback.onCallback("User");
+                                }
+                            } else {
+                                callback.onCallback("User");
+                            }
+                        }
+                    });
+        } else {
+            callback.onCallback("No User Logged In");
+        }
+    }
+    public interface FirestoreCallback {
+        void onCallback(String userName);
+    }
     @Override
     public void onClickViews() {
         super.onClickViews();
@@ -130,71 +159,28 @@ public class HomeFragment extends BaseFragment {
             Intent intent = new Intent(context, SearchActivity.class);
             startActivity(intent);
         });
-        binding.layoutAll.setOnClickListener(v -> {
-            Intent intent = new Intent(context, ListProductsActivity.class);
-            intent.putExtra("CATE", "ALL"); // Pass the product ID
+        setClickListener(binding.layoutAll, "CATE", "ALL");
+        setClickListener(binding.layoutMen, "CATE", "MAN");
+        setClickListener(binding.layoutWomen, "CATE", "WOMAN");
+        setClickListener(binding.layoutKids, "CATE", "KIDS");
 
-            startActivity(intent);
-        });
-        binding.layoutMen.setOnClickListener(v -> {
-            Intent intent = new Intent(context, ListProductsActivity.class);
-            intent.putExtra("CATE", "MAN"); // Pass the product ID
-
-            startActivity(intent);
-        });
-        binding.layoutWomen.setOnClickListener(v -> {
-            Intent intent = new Intent(context, ListProductsActivity.class);
-            intent.putExtra("CATE", "WOMAN"); // Pass the product ID
-
-            startActivity(intent);
-        });
-        binding.layoutKids.setOnClickListener(v -> {
-            Intent intent = new Intent(context, ListProductsActivity.class);
-            intent.putExtra("CATE", "KIDS"); // Pass the product ID
-
-            startActivity(intent);
-        });
-
-
-        binding.layoutStussy.setOnClickListener(v -> {
-            Intent intent = new Intent(context, ListProductsActivity.class);
-            intent.putExtra("Brand", "Stussy"); // Pass the product ID
-
-            startActivity(intent);
-        });
-        binding.layoutZara.setOnClickListener(v -> {
-            Intent intent = new Intent(context, ListProductsActivity.class);
-            intent.putExtra("Brand", "Zara"); // Pass the product ID
-
-            startActivity(intent);
-        });
-        binding.layoutGucci.setOnClickListener(v -> {
-            Intent intent = new Intent(context, ListProductsActivity.class);
-            intent.putExtra("Brand", "Gucci"); // Pass the product ID
-
-            startActivity(intent);
-        });
-        binding.layoutNike.setOnClickListener(v -> {
-            Intent intent = new Intent(context, ListProductsActivity.class);
-            intent.putExtra("Brand", "Nike"); // Pass the product ID
-
-            startActivity(intent);
-        });
-        binding.layoutChanel.setOnClickListener(v -> {
-            Intent intent = new Intent(context, ListProductsActivity.class);
-            intent.putExtra("Brand", "Chanel"); // Pass the product ID
-
-            startActivity(intent);
-        });
-
+        setClickListener(binding.layoutStussy, "Brand", "Stussy");
+        setClickListener(binding.layoutZara, "Brand", "Zara");
+        setClickListener(binding.layoutGucci, "Brand", "Gucci");
+        setClickListener(binding.layoutNike, "Brand", "Nike");
+        setClickListener(binding.layoutChanel, "Brand", "Chanel");
 
         binding.imgFilter.setOnClickListener(v -> {
             BottomFilter bottomFilter = new BottomFilter(context);
-
-            // Show the BottomFilter
             bottomFilter.show();
         });
     }
-
+    private void setClickListener(View view, String key, String value) {
+        view.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ListProductsActivity.class);
+            intent.putExtra(key, value);
+            startActivity(intent);
+        });
+    }
 
 }

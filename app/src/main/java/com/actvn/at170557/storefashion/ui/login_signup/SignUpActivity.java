@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -36,10 +37,9 @@ import java.util.regex.Pattern;
 public class SignUpActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
-    private EditText emailEditText, passwordEditText, confirmPasswordEditText;
+    private EditText emailEditText, passwordEditText, confirmPasswordEditText, userNameEditText, phoneEditText;
     private ImageView togglePasswordView, toggleConfirmPasswordView;
     private Button signUpButton;
-    TextView user_name;
     private boolean isPasswordVisible = false, isConfirmPasswordVisible = false;
     FirebaseFirestore db;
 
@@ -53,8 +53,9 @@ public class SignUpActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        user_name = findViewById(R.id.user_name);
+        userNameEditText = findViewById(R.id.user_name);
         emailEditText = findViewById(R.id.email_edittext);
+        phoneEditText = findViewById(R.id.phone_edittext);
         passwordEditText = findViewById(R.id.password_edittext);
         confirmPasswordEditText = findViewById(R.id.password_confirm);
         togglePasswordView = findViewById(R.id.password_eye_icon);
@@ -83,13 +84,6 @@ public class SignUpActivity extends AppCompatActivity {
                 createAccount();
             }
         });
-        TextView login_text = findViewById(R.id.login_text);
-        login_text.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
     }
 
     // Phương thức để ẩn thanh điều hướng và status bar
@@ -112,10 +106,12 @@ public class SignUpActivity extends AppCompatActivity {
         String email = emailEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
         String confirmPassword = confirmPasswordEditText.getText().toString().trim();
-        String userName = user_name.getText().toString().trim();
+        String userName = userNameEditText.getText().toString().trim();
+        String phoneNumber = phoneEditText.getText().toString().trim();
 
-        // Check for potential SQL injection in email, password, and userName
-        if (containsSqlInjectionRisk(email) || containsSqlInjectionRisk(password) || containsSqlInjectionRisk(userName)) {
+        // Check for SQL injection in email, password, userName, and phone number
+        if (containsSqlInjectionRisk(email) || containsSqlInjectionRisk(password) ||
+                containsSqlInjectionRisk(userName) || containsSqlInjectionRisk(phoneNumber)) {
             showToast("Thông tin nhập vào không hợp lệ.");
             return;
         }
@@ -147,12 +143,50 @@ public class SignUpActivity extends AppCompatActivity {
             return;
         }
 
+        // Kiểm tra tính hợp lệ của tên người dùng
         if (TextUtils.isEmpty(userName)) {
             showToast("Tên người dùng không được để trống.");
             return;
         }
 
-        // Tạo tài khoản bằng Firebase Authentication
+        if (userName.length() < 3 || userName.length() > 50) {
+            userNameEditText.setError("Tên người dùng phải từ 3 đến 50 ký tự.");
+            return;
+        }
+
+        // Kiểm tra tính hợp lệ của số điện thoại
+        if (TextUtils.isEmpty(phoneNumber)) {
+            showToast("Số điện thoại không được để trống.");
+            return;
+        }
+
+        if (!Patterns.PHONE.matcher(phoneNumber).matches() || phoneNumber.length() < 10 || phoneNumber.length() > 15) {
+            phoneEditText.setError("Số điện thoại không hợp lệ.");
+            return;
+        }
+
+        // Tiếp tục xử lý đăng ký tài khoản sau khi các trường đã được kiểm tra
+        registerWithFirebase(email, password, userName, phoneNumber);
+    }
+
+    // Hàm này để kiểm tra các ký tự nguy hiểm có thể dùng trong tấn công SQL injection hoặc XSS
+    private boolean containsSqlInjectionRisk(String input) {
+        String[] dangerousCharacters = {"'", "\"", ";", "--", "/*", "*/", "#", "<", ">", "&"};
+
+        for (String character : dangerousCharacters) {
+            if (input.contains(character)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    // Phương thức đăng ký người dùng lên Firebase Authentication và Firestore
+    private void registerWithFirebase(String email, String password, String userName, String phoneNumber) {
         ProgressDialog progressDialog = new ProgressDialog(SignUpActivity.this);
         progressDialog.setMessage("Đang xử lý đăng ký...");
         progressDialog.setCancelable(false); // Người dùng không thể hủy dialog bằng cách nhấn ra ngoài
@@ -169,8 +203,13 @@ public class SignUpActivity extends AppCompatActivity {
                             String userId = user.getUid();
 
                             // Thêm người dùng mới vào Firestore
+                            Map<String, Object> userMap = new HashMap<>();
+                            userMap.put("userName", userName);
+                            userMap.put("phoneNumber", phoneNumber);
+                            userMap.put("email", email);
+
                             db.collection("Users").document(userId)
-                                    .set(new User(userName))
+                                    .set(userMap)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
@@ -191,36 +230,16 @@ public class SignUpActivity extends AppCompatActivity {
                 });
     }
 
-    // Phương thức để phát hiện các ký tự có khả năng gây ra SQL injection
-    private boolean containsSqlInjectionRisk(String input) {
-        String[] dangerousCharacters = {"'", "\"", ";", "--", "/*", "*/", "#", "="};
-
-        for (String character : dangerousCharacters) {
-            if (input.contains(character)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-
     // Phương thức chuyển đổi giữa hiển thị và ẩn mật khẩu
     private void togglePasswordVisibility() {
         if (isPasswordVisible) {
-            // Đặt inputType thành mật khẩu (ẩn)
-            passwordEditText.setInputType(129); // InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD
+            passwordEditText.setInputType(129);
             togglePasswordView.setImageResource(R.drawable.ic_eye);
         } else {
-            // Đặt inputType thành văn bản thường (hiển thị)
-            passwordEditText.setInputType(145); // InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+            passwordEditText.setInputType(145);
             togglePasswordView.setImageResource(R.drawable.ic_eye);
         }
         isPasswordVisible = !isPasswordVisible;
-        // Đưa con trỏ về cuối chuỗi
         passwordEditText.setSelection(passwordEditText.length());
     }
 
@@ -242,5 +261,4 @@ public class SignUpActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
-
 }

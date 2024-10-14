@@ -16,7 +16,6 @@ import com.actvn.at170557.storefashion.R;
 import com.actvn.at170557.storefashion.ui.main.home.model.ProductItem;
 import com.actvn.at170557.storefashion.utils.FirebaseStorageHelper;
 import com.bumptech.glide.Glide;
-import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.List;
 

@@ -30,24 +30,18 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash); // Nếu có layout cho SplashActivity
+        setContentView(R.layout.activity_splash);
         hideNavigationBar();
         boolean isFirstTime = SharedManage.getInstance(getApplicationContext()).isFirstAppOpen();
-
-        // Đặt độ trễ 1 giây (1000 milliseconds)
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (isFirstTime) {
                 Intent intent = new Intent(SplashActivity.this, OnboardingActivity.class);
                 startActivity(intent);
-                finish(); // Đóng Spl
+                finish();
             } else {
                 LoadScreen();
-
             }
-            // Kiểm tra xem người dùng đã xem onboarding chưa
-            // Nếu chưa, chuyển tới OnboardingActivity
-
-        }, 1000); // Thời gian trễ là 1000ms = 1 giây
+        }, 1000);
         mAuth = FirebaseAuth.getInstance();
 
     }
@@ -60,22 +54,17 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     public void LoadScreen() {
-        mAuth = FirebaseAuth.getInstance(); // Khởi tạo FirebaseAuth
-
+        mAuth = FirebaseAuth.getInstance();
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             FirebaseUser currentUser = mAuth.getCurrentUser();
             if (currentUser != null) {
-                // Người dùng đã đăng nhập, chuyển tới MainActivity
                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(intent);
             } else {
-                // Người dùng chưa đăng nhập, chuyển tới LoginActivity
                 Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
                 startActivity(intent);
             }
             finish();
         }, 1000);
     }
-
-
 }
