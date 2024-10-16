@@ -36,7 +36,7 @@ public class DetailProductActivity extends AppCompatActivity {
     private final int MIN_VALUE = 1;
     private final int MAX_VALUE = 10;
     private String userId;
-    private String selectedSize = "S"; // Default size, update this based on selection
+    private String selectedSize = "S";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +44,6 @@ public class DetailProductActivity extends AppCompatActivity {
         binding = ActivityDetailProductBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         hideNavigationBar();
-
         userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         textViewName = findViewById(R.id.textViewName);
@@ -117,12 +116,10 @@ public class DetailProductActivity extends AppCompatActivity {
         binding.imageViewLikeProduct.setOnClickListener(v -> {
             toggleFavoriteStatus(productId);
         });
-
-        // Add to Cart button logic
         binding.AddToCard.setOnClickListener(v -> {
             String productName = textViewName.getText().toString();
             double productPrice = Double.parseDouble(textViewPrice.getText().toString().replace("$", ""));
-            String imageUrl = pathIMG; // Use the pathIMG or the URL retrieved from Firebase Storage
+            String imageUrl = pathIMG;
 
             addToCart(productId, productName, selectedSize, productPrice, currentValue, imageUrl);
         });
@@ -285,12 +282,10 @@ public class DetailProductActivity extends AppCompatActivity {
                             .addOnFailureListener(e -> Toast.makeText(this, "Error creating cart", Toast.LENGTH_SHORT).show());
                 }
             } else {
-                // Xử lý lỗi khi không lấy được tài liệu
                 Toast.makeText(this, "Error fetching cart data", Toast.LENGTH_SHORT).show();
             }
         });
     }
-
     protected void hideNavigationBar() {
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);

@@ -28,10 +28,8 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Initialize FirebaseAuth
         mAuth = FirebaseAuth.getInstance();
 
-        // Setup views
         ImageView togglePasswordView = findViewById(R.id.password_eye_icon);
         emailEditText = findViewById(R.id.email_edittext);
         passwordEditText = findViewById(R.id.password_edittext);
@@ -55,7 +53,6 @@ public class LoginActivity extends AppCompatActivity {
         String email = emailEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
 
-        // Check for potential SQL injection
         if (containsSqlInjectionRisk(email) || containsSqlInjectionRisk(password)) {
             showToast("Thông tin nhập vào không hợp lệ.");
             return;
@@ -84,7 +81,6 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    // Phương thức để phát hiện các ký tự có khả năng gây ra SQL injection
     private boolean containsSqlInjectionRisk(String input) {
         // Danh sách các ký tự có nguy cơ gây SQL injection
         String[] dangerousCharacters = {"'", "\"", ";", "--", "/*", "*/", "#", "="};
@@ -103,16 +99,15 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private boolean isValidPassword(String password) {
-        // Password must contain at least one uppercase, one lowercase, one digit, one special character, and be at least 8 characters long
         String passwordPattern = "^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[@#$%^&+=!]).{8,}$";
         return !TextUtils.isEmpty(password) && password.matches(passwordPattern);
     }
 
     private void togglePasswordVisibility() {
         if (isPasswordVisible) {
-            passwordEditText.setInputType(129); // InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD
+            passwordEditText.setInputType(129);
         } else {
-            passwordEditText.setInputType(145); // InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+            passwordEditText.setInputType(145);
         }
         isPasswordVisible = !isPasswordVisible;
         passwordEditText.setSelection(passwordEditText.length());

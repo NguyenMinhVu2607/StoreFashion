@@ -201,7 +201,17 @@ public class SignUpActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             FirebaseUser user = mAuth.getCurrentUser();
                             String userId = user.getUid();
-
+                            user.sendEmailVerification()
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> emailTask) {
+                                            if (emailTask.isSuccessful()) {
+                                                Toast.makeText(SignUpActivity.this, "Account created successfully. Please check your email to verify your account.", Toast.LENGTH_LONG).show();
+                                            } else {
+                                                Toast.makeText(SignUpActivity.this, "Account creation successful but verification email could not be sent. Please try again later.", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
                             // Thêm người dùng mới vào Firestore
                             Map<String, Object> userMap = new HashMap<>();
                             userMap.put("userName", userName);
@@ -213,14 +223,14 @@ public class SignUpActivity extends AppCompatActivity {
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            Toast.makeText(SignUpActivity.this, "Tài khoản đã được tạo thành công. Hãy đăng nhập.", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(SignUpActivity.this, "Account created successfully. Please log in.", Toast.LENGTH_SHORT).show();
                                             navigateToLoginActivity();
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-                                            Toast.makeText(SignUpActivity.this, "Đăng ký thành công nhưng lỗi khi lưu dữ liệu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(SignUpActivity.this, "Registration successful but error saving data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                         }
                                     });
                         } else {
@@ -230,7 +240,6 @@ public class SignUpActivity extends AppCompatActivity {
                 });
     }
 
-    // Phương thức chuyển đổi giữa hiển thị và ẩn mật khẩu
     private void togglePasswordVisibility() {
         if (isPasswordVisible) {
             passwordEditText.setInputType(129);
@@ -243,7 +252,6 @@ public class SignUpActivity extends AppCompatActivity {
         passwordEditText.setSelection(passwordEditText.length());
     }
 
-    // Phương thức chuyển đổi giữa hiển thị và ẩn xác nhận mật khẩu
     private void toggleConfirmPasswordVisibility() {
         if (isConfirmPasswordVisible) {
             confirmPasswordEditText.setInputType(129);

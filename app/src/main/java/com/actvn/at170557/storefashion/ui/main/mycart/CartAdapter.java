@@ -22,14 +22,13 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 import java.util.List;
 
-// CartAdapter class for handling RecyclerView in MyCartsActivity
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
 
     private Context context;
     private List<CartItem> cartItemList;
     private OnCartItemDeleteListener deleteListener;
     private OnCartItemActionListener actionListener;
-    private List<CartItem> selectedItems = new ArrayList<>(); // List to store selected items
+    private List<CartItem> selectedItems = new ArrayList<>();
 
     public CartAdapter(Context context, List<CartItem> cartItemList, OnCartItemDeleteListener deleteListener, OnCartItemActionListener actionListener) {
         this.context = context;
@@ -48,8 +47,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     @Override
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
         CartItem item = cartItemList.get(position);
-
-        // Load image using FirebaseStorageHelper and Glide
         FirebaseStorageHelper.getImageUri(item.getImageUrl(), uri -> {
             if (uri != null) {
                 Glide.with(context)
@@ -60,28 +57,22 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             }
         });
 
-        // Set other item details
         holder.titleTextView.setText(item.getName());
         holder.priceTextView.setText("$" + item.getPrice());
         holder.quantityTextView.setText(item.getQuantity());
         holder.cart_item_size.setText("Size: " + item.getSize());
 
-        // Set checkbox state based on selectedItems list
         holder.checkBox.setChecked(selectedItems.contains(item));
-
-        // Handle checkbox selection/deselection
-        // Thiết lập checkbox
         holder.checkBox.setChecked(item.isChecked());
 
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            item.setChecked(isChecked); // Cập nhật trạng thái isChecked
-            actionListener.onItemSelected(selectedItems); // Cập nhật listener với các item được chọn
-            actionListener.onTotalAmountUpdated(); // Gọi phương thức để tính toán lại tổng số tiền
+            item.setChecked(isChecked);
+            actionListener.onItemSelected(selectedItems);
+            actionListener.onTotalAmountUpdated();
         });
 
 
 
-        // Handle other buttons for quantity increment/decrement
         holder.add_a_product.setOnClickListener(v -> actionListener.onAddQuantity(item, position));
         holder.minus_a_product.setOnClickListener(v -> actionListener.onRemoveQuantity(item, position));
         holder.removeCityButton.setOnClickListener(v -> deleteListener.onCartItemDelete(position, item));
@@ -124,7 +115,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             titleTextView = itemView.findViewById(R.id.cart_item_title);
             priceTextView = itemView.findViewById(R.id.cart_item_price);
             quantityTextView = itemView.findViewById(R.id.cart_item_quantity);
-            checkBox = itemView.findViewById(R.id.checkbox_select_item); // Initialize CheckBox
+            checkBox = itemView.findViewById(R.id.checkbox_select_item);
         }
     }
 }

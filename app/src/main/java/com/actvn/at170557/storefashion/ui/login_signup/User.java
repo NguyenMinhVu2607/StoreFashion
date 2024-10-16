@@ -4,7 +4,6 @@ public class User {
     private String name;
 
     public User() {
-        // Required for Firestore
     }
 
     public User(String name) {

@@ -6,9 +6,7 @@ public class Address {
     private String ward;
     private String district;
     private String city;
-    // Constructor mặc định (cần cho Firestore)
     public Address() {
-        // Constructor trống
     }
     // Constructor
     public Address(String addressName, String street, String ward, String district, String city) {
@@ -19,7 +17,6 @@ public class Address {
         this.city = city;
     }
 
-    // Getters và setters
     public String getAddressName() { return addressName; }
     public void setAddressName(String addressName) { this.addressName = addressName; }
 

@@ -11,11 +11,9 @@ public class Order {
     private String fullAddress;
     private String phoneNumber;
     private double totalAmount;
-    private ArrayList<CartItem> items; // CartItem là model sản phẩm trong đơn hàng
+    private ArrayList<CartItem> items;
 
-    // Constructor không tham số (cho Firestore deserialization)
     public Order() {
-        // Khởi tạo items là một ArrayList rỗng nếu không có dữ liệu
         this.items = new ArrayList<>();
     }
 

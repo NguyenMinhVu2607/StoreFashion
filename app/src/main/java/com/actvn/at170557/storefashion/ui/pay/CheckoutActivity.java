@@ -25,6 +25,7 @@ import com.actvn.at170557.storefashion.ui.address.Address;
 import com.actvn.at170557.storefashion.ui.address.ListAddressActivity;
 import com.actvn.at170557.storefashion.ui.main.mycart.CartItem;
 import com.actvn.at170557.storefashion.ui.order.orderPreview.OrderPreviewActivity;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -53,18 +54,14 @@ public class CheckoutActivity extends AppCompatActivity {
                 Log.d("CheckoutActivity", "Item: " + item.getName() + ", Price: " + item.getPrice());
             }
         }
-        // Lấy số điện thoại của user đã đăng nhập
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
-            // Kiểm tra nếu tài khoản có số điện thoại
             String phoneNumber = currentUser.getPhoneNumber();
 
             if (phoneNumber != null) {
-                // Cập nhật số điện thoại lên TextView
                 TextView tvPhoneNumber = findViewById(R.id.tvPhoneNumber); // Thay bằng id của TextView bạn muốn set
                 tvPhoneNumber.setText(phoneNumber);
             } else {
-                // Trường hợp người dùng không có số điện thoại (ví dụ: đăng nhập bằng email)
                 Toast.makeText(this, "Tài khoản không có số điện thoại", Toast.LENGTH_SHORT).show();
             }
         } else {
@@ -100,8 +97,7 @@ public class CheckoutActivity extends AppCompatActivity {
                 popup.show();
             }
         });
-        binding.gotoPaynow.setOnClickListener(v -> proceedToOrderPreview());
-// TextWatcher cho thẻ tín dụng (Card Number)
+        binding.gotoPaynow.setOnClickListener(v -> proceedToOrderPreview(currentUser));
         binding.tvCardnumber.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -127,7 +123,6 @@ public class CheckoutActivity extends AppCompatActivity {
             }
         });
 
-// TextWatcher cho ngày hết hạn (Exp Date)
         binding.tvExDate.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -153,7 +148,6 @@ public class CheckoutActivity extends AppCompatActivity {
             }
         });
 
-// TextWatcher cho CVV
         binding.tvCvv.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -189,7 +183,6 @@ public class CheckoutActivity extends AppCompatActivity {
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        // Kiểm tra nếu có ít nhất 1 địa chỉ
                         if (!task.getResult().isEmpty()) {
                             // Lấy địa chỉ đầu tiên (vị trí 0)
                             DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
@@ -264,13 +257,42 @@ public class CheckoutActivity extends AppCompatActivity {
 
             Toast.makeText(this, "Đã chọn địa chỉ: " + selectedAddress.getStreet(), Toast.LENGTH_SHORT).show();
         });
-
-        // Hiển thị dialog
         builder.create().show();
     }
 
-    private void proceedToOrderPreview() {
-        // Lấy địa chỉ
+    private void proceedToOrderPreview(FirebaseUser currentUser) {
+        Log.d("proceedToOrderPreview", "Proceed to Order Preview: " + currentUser.isEmailVerified());
+
+        if (currentUser != null) {
+            currentUser.reload().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    if (!currentUser.isEmailVerified()) {
+                        // Nếu tài khoản chưa xác thực email
+                        Snackbar.make(binding.getRoot(), "Tài khoản chưa được xác thực. Vui lòng kiểm tra email của bạn.", Snackbar.LENGTH_LONG)
+                                .setAction("Gửi lại email xác thực", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        currentUser.sendEmailVerification()
+                                                .addOnCompleteListener(task -> {
+                                                    if (task.isSuccessful()) {
+                                                        Snackbar.make(binding.getRoot(), "Email xác thực đã được gửi!", Snackbar.LENGTH_LONG).show();
+                                                    } else {
+                                                        Snackbar.make(binding.getRoot(), "Không thể gửi email xác thực. Thử lại sau.", Snackbar.LENGTH_LONG).show();
+                                                    }
+                                                });
+                                    }
+                                })
+                                .show();
+                        return;
+                    } else {
+
+                    }
+                } else {
+                    // Xử lý lỗi khi không thể tải lại thông tin người dùng
+                    Snackbar.make(binding.getRoot(), "Không thể kiểm tra trạng thái xác thực. Thử lại sau.", Snackbar.LENGTH_LONG).show();
+                }
+            });
+        }
         String addressName = ((TextView) findViewById(R.id.tvAddress_name)).getText().toString();
         String fullAddress = ((TextView) findViewById(R.id.tv_fullAddress)).getText().toString();
 
@@ -282,16 +304,13 @@ public class CheckoutActivity extends AppCompatActivity {
         String expDate = ((EditText) findViewById(R.id.tv_ex_date)).getText().toString();
         String cvv = ((EditText) findViewById(R.id.tv_cvv)).getText().toString();
 
-        // Lấy thông tin phương thức thanh toán
         String paymentType = binding.tvPaytype.getText().toString();
 
-        // Kiểm tra thông tin đầy đủ
         if (phoneNumber.isEmpty()) {
             Toast.makeText(this, "Vui lòng nhập số điện thoại", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Chuyển qua màn hình OrderPreview
         Intent intent = new Intent(CheckoutActivity.this, OrderPreviewActivity.class);
         intent.putExtra("ADDRESS_NAME", addressName);
         intent.putExtra("FULL_ADDRESS", fullAddress);

@@ -14,11 +14,11 @@ import com.actvn.at170557.storefashion.ui.main.setting.SettingFragment;
 
 public class ViewPagerAdapter extends FragmentStateAdapter {
 
-    private String userId; // Thêm thuộc tính để lưu userId
+    private String userId;
 
     public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, String userId) {
         super(fragmentActivity);
-        this.userId = userId; // Khởi tạo userId
+        this.userId = userId;
     }
 
     @NonNull
@@ -31,7 +31,6 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
                 return new FavouriteFragment();
             case 2:
                 MyCartFragment myCartFragment = new MyCartFragment();
-                // Đặt userId vào Bundle và truyền cho MyCartFragment
                 Bundle bundle = new Bundle();
                 bundle.putString("USER_ID", userId);
                 myCartFragment.setArguments(bundle);
@@ -45,17 +44,6 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 4; // Số lượng trang (4)
+        return 4;
     }
-
-//    @Override
-//    public long getItemId(int position) {
-//        return position; // Trả về vị trí của trang
-//    }
-//
-//
-//    @Override
-//    public boolean containsItem(long itemId) {
-//        return itemId >= 0 && itemId < getItemCount(); // Trả về true nếu itemId hợp lệ
-//    }
 }

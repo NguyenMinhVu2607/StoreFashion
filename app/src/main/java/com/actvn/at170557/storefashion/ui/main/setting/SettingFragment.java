@@ -27,6 +27,7 @@ import com.actvn.at170557.storefashion.baseapplication.BaseFragment;
 import com.actvn.at170557.storefashion.databinding.FragmentSettingsBinding;
 import com.actvn.at170557.storefashion.ui.address.ListAddressActivity;
 import com.actvn.at170557.storefashion.ui.login_signup.LoginActivity;
+import com.actvn.at170557.storefashion.ui.main.home.HomeFragment;
 import com.actvn.at170557.storefashion.ui.main.mycart.MyCartFragment;
 import com.actvn.at170557.storefashion.ui.order.OrderHistoryActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -39,12 +40,18 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class SettingFragment extends BaseFragment implements OnMapReadyCallback {
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 102;
-    private FragmentSettingsBinding binding; // Use the generated binding class
+    private FragmentSettingsBinding binding;
     private Context context;
     private MapView mapView;
     private GoogleMap googleMap;
@@ -62,31 +69,41 @@ public class SettingFragment extends BaseFragment implements OnMapReadyCallback 
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+
+
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         context = getContext();
 
-        // Khởi tạo FusedLocationProviderClient
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
-// Khởi tạo FusedLocationProviderClient
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
 
-        // Kiểm tra quyền và lấy vị trí
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             getCurrentLocation();
         } else {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
         }
-        mapView = binding.mapView; // Giả sử bạn đã thêm MapView vào layout
+        mapView = binding.mapView;
         mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(this); // Thay đổi ở đây
+        mapView.getMapAsync(this);
+        getUserNameFromFirestore(new SettingFragment.FirestoreCallback() {
+            @Override
+            public void onCallback(String userName) {
+                binding.txtUserName.setText(userName);
+            }
+        });
         binding.logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FirebaseAuth.getInstance().signOut();
-                Toast.makeText(context, "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Logout successful", Toast.LENGTH_SHORT).show();
 
-                // Redirect to login activity after logging out
                 Intent intent = new Intent(getContext(), LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
@@ -113,7 +130,6 @@ public class SettingFragment extends BaseFragment implements OnMapReadyCallback 
             @Override
             public void onClick(View v) {
                 Toast.makeText(context, "MAIL ::", Toast.LENGTH_SHORT).show();
-                // Mở ứng dụng email
                 try {
                     Intent intent = new Intent(Intent.ACTION_MAIN);
                     intent.addCategory(Intent.CATEGORY_APP_EMAIL);
@@ -123,15 +139,14 @@ public class SettingFragment extends BaseFragment implements OnMapReadyCallback 
                 }
             }
         });
-
         binding.layoutMycart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Chuyển đến MyCartFragment
                 getActivity().getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.viewPager, new MyCartFragment()) // Thay đổi R.id.fragment_container bằng ID thực tế của container fragment
-                        .addToBackStack(null) // Thêm transaction vào back stack
+                        .replace(R.id.viewPager, new MyCartFragment())
+                        .addToBackStack(null)
                         .commit();
             }
         });
@@ -175,33 +190,69 @@ public class SettingFragment extends BaseFragment implements OnMapReadyCallback 
     @Override
     public void onMapReady(GoogleMap map) {
         googleMap = map;
-        // Kiểm tra quyền truy cập vị trí
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Yêu cầu quyền truy cập vị trí
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             return;
         }
-
-        // Lấy vị trí hiện tại của người dùng
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
                         if (location != null) {
                             LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                            // Hiển thị vị trí của người dùng
-                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15)); // Đặt mức zoom 15
+                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
                             googleMap.addCircle(new CircleOptions()
                                     .center(userLocation)
-                                    .radius(100) // Đường kính 100m
-                                    .strokeColor(0xFF0000FF) // Màu viền xanh
-                                    .fillColor(0x220000FF)); // Màu nền xanh nhạt
+                                    .radius(100)
+                                    .strokeColor(0xFF0000FF)
+                                    .fillColor(0x220000FF));
                         }
                     }
                 });
     }
+    public interface FirestoreCallback {
+        void onCallback(String userName);
+    }
+    public void getUserNameFromFirestore(SettingFragment.FirestoreCallback callback) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null && !currentUser.isEmailVerified()) {
+            binding.txtVerify.setText("Not verified");
+            binding.txtVerify.setBackgroundColor(getResources().getColor(R.color.red));
+        } else {
+            binding.txtVerify.setText("Verified");
+            binding.txtVerify.setBackgroundColor(getResources().getColor(R.color.color_bar_pre));
+        }
 
-    // Các phương thức để quản lý MapView
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("Users").document(userId).get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()) {
+                                    String userName = document.getString("userName");
+
+                                    if (userName != null && !userName.isEmpty()) {
+                                        callback.onCallback(userName);
+                                    } else {
+                                        callback.onCallback("User");
+                                    }
+                                } else {
+                                    callback.onCallback("User");
+                                }
+                            } else {
+                                callback.onCallback("User");
+                            }
+                        }
+                    });
+        } else {
+            callback.onCallback("No User Logged In");
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();

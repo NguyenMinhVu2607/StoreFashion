@@ -5,6 +5,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.actvn.at170557.storefashion.R;
@@ -27,9 +29,14 @@ public class OrderHistoryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_order_history);
 
         recyclerView = findViewById(R.id.recyclerViewOrders);
+        ImageView img_back = findViewById(R.id.img_back);
+        img_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        // Lấy dữ liệu từ Firestore
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseAuth auth = FirebaseAuth.getInstance();
         String userId = auth.getCurrentUser().getUid();
@@ -52,14 +59,11 @@ public class OrderHistoryActivity extends AppCompatActivity {
                 });
     }
 
-    // Hủy đơn hàng và cập nhật Firestore
     private void cancelOrder(Order order) {
-        // Kiểm tra xem đơn hàng đã bị hủy chưa
         if (order.getStatus().equals("Canceled")) {
             Toast.makeText(OrderHistoryActivity.this, "Order already canceled", Toast.LENGTH_SHORT).show();
             return;
         }
-
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("Orders")
                 .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -68,11 +72,11 @@ public class OrderHistoryActivity extends AppCompatActivity {
                 .update("status", "Canceled")
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(OrderHistoryActivity.this, "Order canceled", Toast.LENGTH_SHORT).show();
-                    // Cập nhật lại danh sách sau khi hủy
                     order.setStatus("Canceled");
-                    // Xóa đơn hàng khỏi danh sách và thông báo cập nhật
-                    orderList.remove(order);
-                    orderAdapter.notifyItemRemoved(orderList.indexOf(order));
+                    int position = orderList.indexOf(order);
+                    if (position != -1) {
+                        orderAdapter.notifyItemChanged(position);
+                    }
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(OrderHistoryActivity.this, "Error canceling order", Toast.LENGTH_SHORT).show();

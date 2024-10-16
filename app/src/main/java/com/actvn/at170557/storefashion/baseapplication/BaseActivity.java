@@ -44,22 +44,18 @@ public abstract class BaseActivity<B extends ViewBinding> extends AppCompatActiv
             new ActivityResultContracts.RequestPermission(),
             isGranted -> {
                 if (isGranted) {
-                    // FCM SDK (and your app) can post notifications.
-//                    WorkHelper.scheduleAddLocationWork(this);
 
                 } else {
-                    // TODO: Inform user that your app will not show notifications.
+
                 }
             }
     );
 
     public void askNotificationPermission() {
-        // This is only necessary for API level >= 33 (TIRAMISU)
         Log.d("ZZZZ", "askNotificationPermission: ");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
                     PackageManager.PERMISSION_GRANTED) {
-//                WorkHelper.scheduleAddLocationWork(this);
             } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             } else {
@@ -67,14 +63,8 @@ public abstract class BaseActivity<B extends ViewBinding> extends AppCompatActiv
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             }
         } else {
-//            WorkHelper.scheduleAddLocationWork(this);
         }
     }
-
-//    @Override
-//    protected void attachBaseContext(Context newBase) {
-//        super.attachBaseContext(LocaleHelper.setLocale(newBase));
-//    }
 
     @Override
     public void onCreate(Bundle bundle) {

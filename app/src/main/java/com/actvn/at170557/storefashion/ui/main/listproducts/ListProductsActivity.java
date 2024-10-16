@@ -50,17 +50,17 @@ public class ListProductsActivity extends AppCompatActivity {
         if (BrandID != null) {
             loadProductsFromFirestore(BrandID);
             binding.tvCate.setText(BrandID);
-//
+
         }
 
 
         binding.imgBack.setOnClickListener(v -> finish());
     }
+
     private void loadProductsFromFirestore(String BrandID) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference productsRef = db.collection("Products");
 
-        // Cập nhật truy vấn để lọc sản phẩm theo cateID
         productsRef.whereEqualTo("brand", BrandID)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -70,7 +70,7 @@ public class ListProductsActivity extends AppCompatActivity {
                             List<ProductItem> itemList = new ArrayList<>();
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 ProductItem product = document.toObject(ProductItem.class);
-                                product.setId(document.getId()); // Gán ID từ tài liệu
+                                product.setId(document.getId());
 
                                 itemList.add(product);
 
@@ -81,17 +81,14 @@ public class ListProductsActivity extends AppCompatActivity {
                                 Log.d("ProductItem", "Price: " + product.getPrice());
                                 Log.d("ProductItem", "Sizes: " + (product.getSize() != null ? product.getSize().toString() : "No sizes available"));
                             }
-
-                            // Đặt adapter sau khi lấy dữ liệu
                             PopularAdapter popularAdapter = new PopularAdapter(context, itemList, item -> {
                                 Intent intent = new Intent(context, DetailProductActivity.class);
-                                intent.putExtra("PRODUCT_ID", item.getId()); // Truyền ID sản phẩm
+                                intent.putExtra("PRODUCT_ID", item.getId());
                                 startActivity(intent);
                             });
                             binding.recListCate.setLayoutManager(new GridLayoutManager(context, 2));
                             binding.recListCate.setAdapter(popularAdapter);
                         } else {
-                            // Xử lý lỗi
                             Log.d("ProductItem", "Lỗi khi lấy tài liệu: ", task.getException());
                         }
                     }
@@ -102,7 +99,6 @@ public class ListProductsActivity extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference productsRef = db.collection("Products");
 
-        // Cập nhật truy vấn để lọc sản phẩm theo cateID
         productsRef.whereEqualTo("cate", cateID)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -112,11 +108,10 @@ public class ListProductsActivity extends AppCompatActivity {
                             List<ProductItem> itemList = new ArrayList<>();
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 ProductItem product = document.toObject(ProductItem.class);
-                                product.setId(document.getId()); // Gán ID từ tài liệu
+                                product.setId(document.getId());
 
                                 itemList.add(product);
 
-                                // Ghi dữ liệu vào log
                                 Log.d("ProductItem", "Brand: " + product.getBrand());
                                 Log.d("ProductItem", "Description: " + product.getDescription());
                                 Log.d("ProductItem", "Name: " + product.getName());
@@ -127,7 +122,7 @@ public class ListProductsActivity extends AppCompatActivity {
                             // Đặt adapter sau khi lấy dữ liệu
                             PopularAdapter popularAdapter = new PopularAdapter(context, itemList, item -> {
                                 Intent intent = new Intent(context, DetailProductActivity.class);
-                                intent.putExtra("PRODUCT_ID", item.getId()); // Truyền ID sản phẩm
+                                intent.putExtra("PRODUCT_ID", item.getId());
                                 startActivity(intent);
                             });
                             binding.recListCate.setLayoutManager(new GridLayoutManager(context, 2));
@@ -139,8 +134,6 @@ public class ListProductsActivity extends AppCompatActivity {
                     }
                 });
     }
-
-
 
     protected void hideNavigationBar() {
         Window window = getWindow();

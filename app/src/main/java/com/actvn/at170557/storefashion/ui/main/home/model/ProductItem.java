@@ -3,18 +3,17 @@ package com.actvn.at170557.storefashion.ui.main.home.model;
 import java.util.List;
 
 public class ProductItem {
-    private String id; // Add this field
+    private String id;
     private String brand;
     private String description;
     private String desciption;
     private String name;
     private String price;
     private String cate;
-    private String linkImg; // Thêm trường này
+    private String linkImg;
 
     private List<String> size;
 
-    // Default constructor (required for Firestore)
     public ProductItem() {
     }
 

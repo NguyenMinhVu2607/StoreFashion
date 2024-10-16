@@ -52,8 +52,8 @@ public class ListAddressActivity extends AppCompatActivity {
         EditText edtDistrict = dialogView.findViewById(R.id.edtDistrict);
         EditText edtCity = dialogView.findViewById(R.id.edtCity);
 
-        builder.setTitle("Thêm Địa Chỉ")
-                .setPositiveButton("Lưu", (dialog, which) -> {
+        builder.setTitle("Add Address")
+                .setPositiveButton("Save", (dialog, which) -> {
                     String addressName = edtAddressName.getText().toString();
                     String street = edtStreet.getText().toString();
                     String ward = edtWard.getText().toString();
@@ -61,7 +61,7 @@ public class ListAddressActivity extends AppCompatActivity {
                     String city = edtCity.getText().toString();
                     saveAddressToFirestore(addressName, street, ward, district, city);
                 })
-                .setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
 
         AlertDialog dialog = builder.create();
         dialog.show();
@@ -70,26 +70,19 @@ public class ListAddressActivity extends AppCompatActivity {
 
     private void saveAddressToFirestore(String addressName, String street, String ward, String district, String city) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        // Tạo một đối tượng địa chỉ
         Address address = new Address(addressName, street, ward, district, city);
-
-        // Tạo ID ngẫu nhiên cho địa chỉ
         String addressId = db.collection("UserAddresses").document(userId).collection("Addresses").document().getId();
 
-        // Lưu địa chỉ vào collection Addresses của user
         db.collection("UserAddresses").document(userId)
                 .collection("Addresses").document(addressId)
-                .set(address) // Sử dụng set để lưu địa chỉ với ID riêng
+                .set(address)
                 .addOnSuccessListener(aVoid -> {
-                    // Đã lưu thành công
-                    Toast.makeText(this, "Địa chỉ đã được lưu", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Address saved", Toast.LENGTH_SHORT).show();
                     // Cập nhật lại danh sách địa chỉ
-                    setupRecyclerView(); // Tải lại danh sách địa chỉ sau khi thêm mới
+                    setupRecyclerView();
                 })
                 .addOnFailureListener(e -> {
-                    // Lưu thất bại
-                    Toast.makeText(this, "Lưu địa chỉ thất bại", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Save address failed", Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -106,15 +99,12 @@ public class ListAddressActivity extends AppCompatActivity {
     private void setupRecyclerView() {
         RecyclerView recyclerView = binding.recAddresss;
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        // Tạo danh sách địa chỉ rỗng
         List<Address> addressList = new ArrayList<>();
         AddressAdapter adapter = new AddressAdapter(addressList);
         recyclerView.setAdapter(adapter);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Lấy tất cả địa chỉ từ Firestore
         db.collection("UserAddresses").document(userId)
                 .collection("Addresses")
                 .get()
@@ -122,14 +112,13 @@ public class ListAddressActivity extends AppCompatActivity {
                     if (!queryDocumentSnapshots.isEmpty()) {
                         for (DocumentSnapshot document : queryDocumentSnapshots) {
                             Address address = document.toObject(Address.class);
-                            addressList.add(address); // Thêm địa chỉ vào danh sách
+                            addressList.add(address);
                         }
-                        adapter.notifyDataSetChanged(); // Cập nhật RecyclerView
+                        adapter.notifyDataSetChanged();
                     }
                 })
                 .addOnFailureListener(e -> {
-                    // Xử lý lỗi khi lấy dữ liệu
-                    Toast.makeText(this, "Lấy địa chỉ thất bại", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Get address failed", Toast.LENGTH_SHORT).show();
                 });
     }
 

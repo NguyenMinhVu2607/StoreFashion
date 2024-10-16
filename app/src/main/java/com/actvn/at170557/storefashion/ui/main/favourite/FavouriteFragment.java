@@ -34,7 +34,7 @@ import java.util.List;
 
 
 public class FavouriteFragment extends BaseFragment {
-    private FragmentFavouriteBinding binding; // Use the generated binding class
+    private FragmentFavouriteBinding binding;
     private Context context;
     private SharedViewModel sharedViewModel;
 
@@ -55,26 +55,18 @@ public class FavouriteFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         context = getContext();
-        // Khởi tạo SharedViewModel từ Activity
-//        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
-//        Log.d("FavouriteFragment", "ViewModel initialized");
 
-        // Quan sát dữ liệu UserID và cập nhật giao diện khi dữ liệu thay đổi
-//        sharedViewModel.getUserId().observe(getViewLifecycleOwner(), userId -> {
-        // Cập nhật giao diện hoặc lấy dữ liệu yêu thích dựa trên userId
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Lấy userId từ FirebaseAuth
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         Log.d("FavouriteFragment", "userId : " + userId);
 
         loadFavoriteProducts(userId);
-//        });
-        // Initialize RecyclerView using ViewBinding
+
         RecyclerView recyclerView = binding.recFavourite;
-        recyclerView.setLayoutManager(new GridLayoutManager(context, 2)); // 2 columns
+        recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
 
     }
 
     private void loadFavoriteProducts(String userId) {
-        // Reference to Firestore
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Log.d("FavouriteFragment", "Loading favorite products for user ID: " + userId);
 
@@ -82,7 +74,7 @@ public class FavouriteFragment extends BaseFragment {
         db.collection("Users").document(userId).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        List<String> favoriteProductIds = (List<String>) documentSnapshot.get("favorites"); // assuming 'favorites' is an array of product IDs
+                        List<String> favoriteProductIds = (List<String>) documentSnapshot.get("favorites");
                         if (favoriteProductIds != null && !favoriteProductIds.isEmpty()) {
                             // Fetch details for each product in the favorites list
                             List<ProductItem> favoriteProducts = new ArrayList<>();
@@ -127,10 +119,8 @@ public class FavouriteFragment extends BaseFragment {
         Log.d("FavouriteFragment1", "favoriteProducts:  " + favoriteProducts.size());
 
         PopularAdapter adapter = new PopularAdapter(context, favoriteProducts, item -> {
-            // Xử lý khi item được click
             Intent intent = new Intent(context, DetailProductActivity.class);
             intent.putExtra("PRODUCT_ID", item.getId()); // Chuyển ID sản phẩm
-//            Log.d("FavouriteFragment1", "Id(): " + item.getId());
             Log.d("FavouriteFragment1", "item: " + item.getPrice());
 
             startActivity(intent);

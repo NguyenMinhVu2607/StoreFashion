@@ -31,32 +31,21 @@ public class BottomFilter extends BottomSheetDialog {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Inflate the bottom sheet layout
         View view = LayoutInflater.from(context).inflate(R.layout.bottom_sheet_filter, null);
         setContentView(view);
-
-        // Initialize views from layout
-//        categoryGroup = view.findViewById(R.id.category_group); // Replace with the correct id
-//        priceRangeSeekBar = view.findViewById(R.id.seekbar_price_range); // Replace with the correct id
         applyButton = view.findViewById(R.id.btn_apply);
 
-        // Handle button click
         applyButton.setOnClickListener(v -> {
-            // Implement your filter logic here
-            // For example, get selected category and price range
             int selectedCategoryId = categoryGroup.getCheckedRadioButtonId();
             int selectedPriceRange = priceRangeSeekBar.getProgress();
 
-            // Apply the filter
             applyFilter(selectedCategoryId, selectedPriceRange);
 
-            // Close the BottomSheetDialog
             dismiss();
         });
     }
 
     private void applyFilter(int categoryId, int priceRange) {
-        // Implement your filter logic
-        // Example: Show results based on selected category and price range
+
     }
 }

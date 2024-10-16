@@ -60,20 +60,16 @@ public class MyCartFragment extends BaseFragment implements OnCartItemDeleteList
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        // Setup RecyclerView
         RecyclerView recyclerView = binding.recMycart;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         cartAdapter = new CartAdapter(getContext(), cartItems, this, this);
         recyclerView.setAdapter(cartAdapter);
-
-        // Load cart items from Firestore
         loadCartItems();
 
         binding.gotoCheckout.setOnClickListener(v -> {
-            List<CartItem> selectedItems = getSelectedItems(); // Lấy danh sách sản phẩm đã chọn
+            List<CartItem> selectedItems = getSelectedItems();
             Intent intent = new Intent(getContext(), CheckoutActivity.class);
-            intent.putParcelableArrayListExtra("SELECTED_ITEMS", new ArrayList<>(selectedItems)); // Gửi danh sách sản phẩm
+            intent.putParcelableArrayListExtra("SELECTED_ITEMS", new ArrayList<>(selectedItems));
             startActivity(intent);
         });
     }
@@ -87,6 +83,7 @@ public class MyCartFragment extends BaseFragment implements OnCartItemDeleteList
         }
         return selectedItems;
     }
+
     private void loadCartItems() {
         firestore.collection("Cart").document(userId).get()
                 .addOnCompleteListener(task -> {
@@ -107,8 +104,6 @@ public class MyCartFragment extends BaseFragment implements OnCartItemDeleteList
                                     );
                                     cartItems.add(cartItem);
                                 }
-
-//                                updateTotalAmount(cartItems); // Cập nhật tổng số tiền
                                 cartAdapter.notifyDataSetChanged();
                             }
                         } else {
@@ -121,7 +116,7 @@ public class MyCartFragment extends BaseFragment implements OnCartItemDeleteList
     }
 
     private void updateTotalAmount(List<CartItem> items) {
-        double totalAmount = calculateTotalAmount(getSelectedItems()); // Tính toán tổng chỉ cho các item được chọn
+        double totalAmount = calculateTotalAmount(getSelectedItems());
         TextView tvTotalAmount = binding.tvTotalAmount;
         TextView tvGrandTotal = binding.tvGrandTotal;
         TextView shippingFee = binding.shippingFee;
@@ -137,10 +132,9 @@ public class MyCartFragment extends BaseFragment implements OnCartItemDeleteList
     private double calculateTotalAmount(List<CartItem> selectedItems) {
         double total = 0;
         for (CartItem item : selectedItems) {
-            if (item.isChecked()) { // Chỉ tính cho các item được chọn
+            if (item.isChecked()) {
                 double price = Double.parseDouble(item.getPrice());
                 int quantity = Integer.parseInt(item.getQuantity());
-                // Đảm bảo quantity không phải là "000"
                 if (quantity > 0) {
                     total += price * quantity;
                 }
@@ -148,9 +142,6 @@ public class MyCartFragment extends BaseFragment implements OnCartItemDeleteList
         }
         return total;
     }
-
-
-
 
     @Override
     public void onCartItemDelete(int position, CartItem item) {
@@ -200,7 +191,6 @@ public class MyCartFragment extends BaseFragment implements OnCartItemDeleteList
         }
     }
 
-
     @Override
     public void onItemSelected(List<CartItem> selectedItems) {
 
@@ -208,15 +198,13 @@ public class MyCartFragment extends BaseFragment implements OnCartItemDeleteList
 
     @Override
     public void onTotalAmountUpdated() {
-        updateTotalAmount(cartItems); // Cập nhật tổng số tiền chỉ cho các item được chọn
-
+        updateTotalAmount(cartItems);
     }
 
     private void updateCartInFirebase() {
-        // Chuẩn bị danh sách các bản đồ để cập nhật Firestore
         List<Map<String, Object>> itemsToUpdate = new ArrayList<>();
         for (CartItem cartItem : cartItems) {
-            Map<String, Object> itemMap = new HashMap<>(); // Sử dụng HashMap để tương thích
+            Map<String, Object> itemMap = new HashMap<>();
             itemMap.put("imageUrl", cartItem.getImageUrl());
             itemMap.put("name", cartItem.getName());
             itemMap.put("size", cartItem.getSize());
@@ -224,13 +212,11 @@ public class MyCartFragment extends BaseFragment implements OnCartItemDeleteList
             itemMap.put("quantity", cartItem.getQuantity());
             itemsToUpdate.add(itemMap);
         }
-
-        // Cập nhật các mặt hàng trong Firestore
         firestore.collection("Cart").document(userId)
                 .update("items", itemsToUpdate)
                 .addOnSuccessListener(aVoid -> {
                     Log.d("MyCartFragment", "Giỏ hàng đã được cập nhật thành công");
-                    updateTotalAmount(cartItems); // Cập nhật tổng số tiền sau khi cập nhật
+                    updateTotalAmount(cartItems);
                 })
                 .addOnFailureListener(e -> {
                     Log.e("MyCartFragment", "Lỗi khi cập nhật giỏ hàng: ", e);

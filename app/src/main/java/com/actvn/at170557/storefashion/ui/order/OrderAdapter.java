@@ -44,6 +44,9 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         holder.cancelOrderButton.setOnClickListener(v -> {
             cancelListener.onCancelOrder(order);
         });
+        if(order.getStatus().equals("Canceled")){
+            holder.cancelOrderButton.setVisibility(View.GONE);
+        }
     }
 
     @Override

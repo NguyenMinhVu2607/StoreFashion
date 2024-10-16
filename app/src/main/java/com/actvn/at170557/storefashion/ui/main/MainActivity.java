@@ -38,12 +38,9 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
         setupViewPager(viewPager);
-//        sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
 
-        // Giả sử bạn nhận được UserID từ đâu đó và muốn đẩy nó vào ViewModel
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Lấy userId từ FirebaseAuth
-//        sharedViewModel.setUserId(userId);
-//        Log.d("MainActivity","userId : "+userId);
+
 
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
@@ -88,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupViewPager(ViewPager2 viewPager) {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Lấy userId từ FirebaseAuth
-        ViewPagerAdapter adapter = new ViewPagerAdapter(this, userId); // Truyền userId vào adapter
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        ViewPagerAdapter adapter = new ViewPagerAdapter(this, userId);
         viewPager.setAdapter(adapter);
     }
 
