@@ -200,19 +200,18 @@
         <!--            app:layout_constraintEnd_toStartOf="@+id/textView_scale_value"-->
         <!--            app:layout_constraintStart_toStartOf="parent" />-->
 
-        <TextView
-            android:id="@+id/textView_scale_value"
-            android:layout_width="37dp"
-            android:layout_height="wrap_content"
-            android:background="@color/transparent"
-            android:gravity="end"
-            android:text="10"
-            android:textColor="@color/black"
+<!--        <TextView-->
+<!--            android:id="@+id/textView_scale_value"-->
+<!--            android:layout_width="37dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="@color/transparent"-->
+<!--            android:gravity="end"-->
+<!--            android:text="10"-->
+<!--            android:textColor="@color/black"-->
 
-            app:layout_constraintBottom_toBottomOf="@+id/seekBar_scale"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/seekBar_scale" />
-        />
+<!--            app:layout_constraintBottom_toBottomOf="@+id/seekBar_scale"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/seekBar_scale" />-->
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button

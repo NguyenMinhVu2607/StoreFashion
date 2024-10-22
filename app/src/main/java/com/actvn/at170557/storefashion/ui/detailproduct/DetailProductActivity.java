@@ -201,7 +201,6 @@ public class DetailProductActivity extends AppCompatActivity {
         });
     }
 
-    // Add product to cart
     private void addToCart(String productId, String productName, String productSize, double productPrice, int quantity, String imageUrl) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference cartRef = db.collection("Cart").document(userId);

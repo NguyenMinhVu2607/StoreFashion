@@ -8,7 +8,7 @@ public class ProductItem {
     private String description;
     private String desciption;
     private String name;
-    private String price;
+    private double price;
     private String cate;
     private String linkImg;
 
@@ -67,11 +67,11 @@ public class ProductItem {
         this.name = name;
     }
 
-    public String getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 

@@ -72,7 +72,7 @@ public class OrderPreviewActivity extends AppCompatActivity {
         // Thiết lập RecyclerView để hiển thị các sản phẩm đã chọn
         RecyclerView recyclerView = findViewById(R.id.recyclerViewSelectedItems);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        CartItemAdapter adapter = new CartItemAdapter(selectedItems);
+        CartItemAdapter adapter = new CartItemAdapter(selectedItems,this);
         recyclerView.setAdapter(adapter);
 
         // Tính tổng tiền
